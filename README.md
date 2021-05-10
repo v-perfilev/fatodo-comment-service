@@ -1,5 +1,5 @@
-# Fatodo extended-mysql-skeleton
-Spring app that is used for development of complex microservices with mysql.
+# Fatodo comment service
+Spring app for comments.
 
 ## Tests
 

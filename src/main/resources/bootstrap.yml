@@ -1,6 +1,6 @@
 spring:
   application:
-    name: extended-mysql-skeleton
+    name: comment-service
 
   cloud:
     config:

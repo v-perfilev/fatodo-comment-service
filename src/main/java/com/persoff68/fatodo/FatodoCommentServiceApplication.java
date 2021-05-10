@@ -10,11 +10,11 @@ import java.util.Properties;
 
 @SpringBootApplication
 @EnableConfigurationProperties(AppProperties.class)
-public class ExtendedMysqlSkeletonApplication {
+public class FatodoCommentServiceApplication {
 
     public static void main(String[] args) {
         Properties defaultProfileProperties = AppProfileUtils.getDefaultProfile();
-        SpringApplication app = new SpringApplication(ExtendedMysqlSkeletonApplication.class);
+        SpringApplication app = new SpringApplication(FatodoCommentServiceApplication.class);
         app.setDefaultProperties(defaultProfileProperties);
         app.run();
     }
