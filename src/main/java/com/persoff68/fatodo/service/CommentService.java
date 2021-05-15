@@ -73,7 +73,7 @@ public class CommentService {
     }
 
     @Transactional
-    public void delete(UUID userId, UUID commentId, String text) {
+    public void delete(UUID userId, UUID commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.checkCommentPermission(userId, comment);
