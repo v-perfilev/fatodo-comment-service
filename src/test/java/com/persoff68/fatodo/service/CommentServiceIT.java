@@ -53,7 +53,7 @@ public class CommentServiceIT {
         commentThreadRepository.deleteAll();
         commentRepository.deleteAll();
 
-        doNothing().when(permissionService).checkThreadPermission(any(), any());
+        doNothing().when(permissionService).checkThreadPermission(any());
 
         this.parent = commentService.addParent(USER_1_ID, TARGET_ID, "test");
         this.child1 = commentService.addChild(USER_1_ID, this.parent.getId(), "test");
@@ -73,7 +73,7 @@ public class CommentServiceIT {
     @Test
     public void testGetParentsByThreadId() {
         List<Comment> commentList = commentService
-                .getParentsByTargetIdPageable(USER_1_ID, this.thread.getId(), pageable);
+                .getParentsByTargetIdPageable(this.thread.getId(), pageable);
         assertThat(commentList.size()).isEqualTo(1);
         assertThat(commentList.get(0).getChildren().size()).isEqualTo(2);
     }
@@ -81,7 +81,7 @@ public class CommentServiceIT {
     @Test
     public void testGetChildrenByParentId() {
         List<Comment> commentList = commentService
-                .getChildrenByParentIdPageable(USER_1_ID, this.parent.getId(), pageable);
+                .getChildrenByParentIdPageable(this.parent.getId(), pageable);
         assertThat(commentList.size()).isEqualTo(2);
         commentList.forEach(comment -> {
             assertThat(comment.getParent()).isNotNull();

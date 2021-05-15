@@ -47,9 +47,8 @@ public class CommentController {
     ) {
         offset = Optional.ofNullable(offset).orElse(0);
         size = Optional.ofNullable(size).orElse(DEFAULT_SIZE);
-        UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Pageable pageRequest = OffsetPageRequest.of(offset, size);
-        List<Comment> commentList = commentService.getParentsByTargetIdPageable(userId, targetId, pageRequest);
+        List<Comment> commentList = commentService.getParentsByTargetIdPageable(targetId, pageRequest);
         List<CommentDTO> dtoList = commentList.stream()
                 .map(commentMapper::pojoToDTO)
                 .collect(Collectors.toList());
@@ -64,9 +63,8 @@ public class CommentController {
     ) {
         offset = Optional.ofNullable(offset).orElse(0);
         size = Optional.ofNullable(size).orElse(DEFAULT_SIZE);
-        UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Pageable pageRequest = OffsetPageRequest.of(offset, size);
-        List<Comment> commentList = commentService.getChildrenByParentIdPageable(userId, parentId, pageRequest);
+        List<Comment> commentList = commentService.getChildrenByParentIdPageable(parentId, pageRequest);
         List<CommentDTO> dtoList = commentList.stream()
                 .map(commentMapper::pojoToDTO)
                 .collect(Collectors.toList());

@@ -1,7 +1,6 @@
 package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.model.Comment;
-import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.Reaction;
 import com.persoff68.fatodo.model.ReactionId;
 import com.persoff68.fatodo.model.constant.ReactionType;
@@ -37,8 +36,7 @@ public class ReactionService {
     public void remove(UUID userId, UUID commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(ModelNotFoundException::new);
-        CommentThread thread = comment.getThread();
-        permissionService.checkThreadPermission(userId, thread);
+        permissionService.checkReactionPermission(userId, comment);
 
         ReactionId id = new ReactionId(commentId, userId);
         reactionRepository.findById(id).ifPresent(reactionRepository::delete);
@@ -53,8 +51,7 @@ public class ReactionService {
     protected void set(UUID userId, UUID commentId, ReactionType type) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(ModelNotFoundException::new);
-        CommentThread thread = comment.getThread();
-        permissionService.checkThreadPermission(userId, thread);
+        permissionService.checkReactionPermission(userId, comment);
 
         ReactionId id = new ReactionId(commentId, userId);
         Reaction reaction = reactionRepository.findById(id)

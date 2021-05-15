@@ -16,15 +16,15 @@ public class CommentThreadService {
     private final CommentThreadRepository commentThreadRepository;
     private final PermissionService permissionService;
 
-    public CommentThread getByIdOrCreate(UUID userId, UUID targetId) {
+    public CommentThread getByIdOrCreate(UUID targetId) {
         try {
             CommentThread thread = getById(targetId);
-            permissionService.checkThreadPermission(userId, thread);
+            permissionService.checkThreadPermission(thread);
             return thread;
         } catch (ModelNotFoundException e) {
             CommentThreadType type = getTypeById(targetId);
             CommentThread threadToCreate = CommentThread.of(targetId, type);
-            permissionService.checkThreadPermission(userId, threadToCreate);
+            permissionService.checkThreadPermission(threadToCreate);
             return commentThreadRepository.save(threadToCreate);
         }
     }

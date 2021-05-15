@@ -22,22 +22,22 @@ public class CommentService {
     private final PermissionService permissionService;
     private final EntityManager entityManager;
 
-    public List<Comment> getParentsByTargetIdPageable(UUID userId, UUID targetId, Pageable pageable) {
+    public List<Comment> getParentsByTargetIdPageable(UUID targetId, Pageable pageable) {
         CommentThread thread = threadService.getById(targetId);
-        permissionService.checkThreadPermission(userId, thread);
+        permissionService.checkThreadPermission(thread);
         return commentRepository.findParentCommentsByThreadId(targetId, pageable);
     }
 
-    public List<Comment> getChildrenByParentIdPageable(UUID userId, UUID parentId, Pageable pageable) {
+    public List<Comment> getChildrenByParentIdPageable(UUID parentId, Pageable pageable) {
         Comment parent = commentRepository.findById(parentId)
                 .orElseThrow(ModelNotFoundException::new);
-        permissionService.checkParentPermission(userId, parent);
+        permissionService.checkParentPermission(parent);
         return commentRepository.findChildCommentsByThreadId(parentId, pageable);
     }
 
     @Transactional
     public Comment addParent(UUID userId, UUID targetId, String text) {
-        CommentThread tread = threadService.getByIdOrCreate(userId, targetId);
+        CommentThread tread = threadService.getByIdOrCreate(targetId);
         Comment comment = Comment.of(userId, tread, text);
         return commentRepository.saveAndFlush(comment);
     }
@@ -46,7 +46,7 @@ public class CommentService {
     public Comment addChild(UUID userId, UUID parentId, String text) {
         Comment parent = commentRepository.findById(parentId)
                 .orElseThrow(ModelNotFoundException::new);
-        permissionService.checkParentPermission(userId, parent);
+        permissionService.checkParentPermission(parent);
 
         Comment comment = Comment.of(userId, parent, text);
         comment = commentRepository.saveAndFlush(comment);

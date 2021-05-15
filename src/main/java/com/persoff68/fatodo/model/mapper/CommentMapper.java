@@ -27,7 +27,8 @@ public abstract class CommentMapper {
     @Autowired
     private ReactionMapper reactionMapper;
 
-    @Mapping(target = "forwardedMessage", ignore = true)
+    @Mapping(target = "reactions", ignore = true)
+    @Mapping(target = "children", ignore = true)
     abstract CommentDTO defaultPojoToDTO(Comment comment);
 
     public CommentDTO pojoToDTO(Comment comment) {
