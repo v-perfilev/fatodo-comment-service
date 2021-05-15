@@ -4,5 +4,8 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
 
+    <include file="db/changelog/2021051200000_create_comment_thread_schema.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/2021051203000_create_comment_schema.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/2021051210000_create_comment_reaction_schema.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

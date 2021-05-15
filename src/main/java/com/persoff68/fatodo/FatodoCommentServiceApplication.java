@@ -10,7 +10,8 @@ import java.util.Properties;
 
 @SpringBootApplication
 @EnableConfigurationProperties(AppProperties.class)
-public class FatodoCommentServiceApplication {
+public class
+FatodoCommentServiceApplication {
 
     public static void main(String[] args) {
         Properties defaultProfileProperties = AppProfileUtils.getDefaultProfile();

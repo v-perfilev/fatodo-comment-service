@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
+
+    <changeSet id="00000000000003" author="persoff68">
+
+        <createTable tableName="ftd_comment_reaction">
+
+            <column name="comment_id" type="binary(16)">
+                <constraints primaryKey="true" foreignKeyName="fk_reaction_comment" references="ftd_comment(id)"
+                             nullable="false"/>
+            </column>
+
+            <column name="user_id" type="binary(16)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="type" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timestamp" type="timestamp(6)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex indexName="index_comment_reaction" tableName="ftd_comment_reaction">
+            <column name="comment_id"/>
+        </createIndex>
+
+    </changeSet>
+
+</databaseChangeLog>
