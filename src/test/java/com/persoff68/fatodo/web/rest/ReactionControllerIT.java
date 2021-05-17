@@ -6,7 +6,7 @@ import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.builder.TestComment;
 import com.persoff68.fatodo.builder.TestCommentThread;
 import com.persoff68.fatodo.builder.TestReaction;
-import com.persoff68.fatodo.client.GroupServiceClient;
+import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.Reaction;
@@ -23,7 +23,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,7 +51,7 @@ public class ReactionControllerIT {
     ObjectMapper objectMapper;
 
     @MockBean
-    GroupServiceClient groupServiceClient;
+    ItemServiceClient itemServiceClient;
 
     Comment comment1;
     Comment comment2;
@@ -74,8 +73,8 @@ public class ReactionControllerIT {
         CommentThread thread2 = createThread();
         comment4 = createComment(thread2, USER_ID_2);
 
-        when(groupServiceClient.canRead(Collections.singletonList(thread1.getId()))).thenReturn(true);
-        when(groupServiceClient.canRead(Collections.singletonList(thread2.getId()))).thenReturn(false);
+        when(itemServiceClient.canReadGroup(thread1.getId())).thenReturn(true);
+        when(itemServiceClient.canReadGroup(thread2.getId())).thenReturn(false);
     }
 
     @Test

@@ -2,12 +2,14 @@ package com.persoff68.fatodo.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 import java.util.UUID;
 
 @Data
-public class CommentDTO {
+@EqualsAndHashCode(callSuper = true)
+public class CommentDTO extends AbstractAuditingDTO {
     private UUID threadId;
     private UUID parentId;
     private UUID userId;

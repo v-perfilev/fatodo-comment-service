@@ -1,6 +1,6 @@
 package com.persoff68.fatodo.service;
 
-import com.persoff68.fatodo.client.GroupServiceClient;
+import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.constant.CommentThreadType;
@@ -8,15 +8,13 @@ import com.persoff68.fatodo.service.exception.PermissionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class PermissionService {
 
-    private final GroupServiceClient groupServiceClient;
+    private final ItemServiceClient itemServiceClient;
 
     public void checkThreadPermission(CommentThread thread) {
         CommentThreadType type = thread.getType();
@@ -59,14 +57,17 @@ public class PermissionService {
     }
 
     private void checkGroupPermission(CommentThread thread) {
-        List<UUID> groupList = Collections.singletonList(thread.getId());
-        boolean hasPermission = groupServiceClient.canRead(groupList);
+        boolean hasPermission = itemServiceClient.canReadGroup(thread.getTargetId());
         if (!hasPermission) {
             throw new PermissionException();
         }
     }
 
     private void checkItemPermission(CommentThread thread) {
+        boolean hasPermission = itemServiceClient.canReadItem(thread.getTargetId());
+        if (!hasPermission) {
+            throw new PermissionException();
+        }
     }
 
 
