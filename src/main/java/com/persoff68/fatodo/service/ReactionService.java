@@ -45,7 +45,7 @@ public class ReactionService {
         entityManager.refresh(comment);
 
         // WS
-//        wsService.sendMessageReactionEvent(message);
+        // wsService.sendMessageReactionEvent(message);
     }
 
     protected void set(UUID userId, UUID commentId, ReactionType type) {
@@ -61,7 +61,7 @@ public class ReactionService {
         entityManager.refresh(comment);
 
         // WS
-//        wsService.sendMessageReactionEvent(comment);
+        // wsService.sendMessageReactionEvent(comment);
     }
 
 }
