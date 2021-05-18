@@ -23,7 +23,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@ToString(exclude = {"thread"})
+@ToString(exclude = {"thread", "children"})
 public class Comment extends AbstractAuditingModel {
 
     @ManyToOne

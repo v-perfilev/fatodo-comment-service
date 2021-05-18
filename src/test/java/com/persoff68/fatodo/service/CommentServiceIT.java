@@ -1,6 +1,7 @@
 package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.FatodoCommentServiceApplication;
+import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.repository.CommentRepository;
@@ -20,7 +21,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = FatodoCommentServiceApplication.class)
 @AutoConfigureMockMvc
@@ -41,7 +42,7 @@ public class CommentServiceIT {
     CommentService commentService;
 
     @MockBean
-    PermissionService permissionService;
+    ItemServiceClient itemServiceClient;
 
     CommentThread thread;
     Comment parent;
@@ -53,7 +54,9 @@ public class CommentServiceIT {
         commentThreadRepository.deleteAll();
         commentRepository.deleteAll();
 
-        doNothing().when(permissionService).checkThreadPermission(any());
+        when(itemServiceClient.isGroup(any())).thenReturn(false);
+        when(itemServiceClient.isItem(any())).thenReturn(true);
+        when(itemServiceClient.canReadItem(any())).thenReturn(true);
 
         this.parent = commentService.addParent(USER_1_ID, TARGET_ID, "test");
         this.child1 = commentService.addChild(USER_1_ID, this.parent.getId(), "test");

@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.service;
 
+import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.constant.CommentThreadType;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
@@ -15,6 +16,7 @@ public class CommentThreadService {
 
     private final CommentThreadRepository commentThreadRepository;
     private final PermissionService permissionService;
+    private final ItemServiceClient itemServiceClient;
 
     public CommentThread getByIdOrCreate(UUID targetId) {
         try {
@@ -35,7 +37,15 @@ public class CommentThreadService {
     }
 
     private CommentThreadType getTypeById(UUID targetId) {
-        return CommentThreadType.GROUP;
+        boolean isGroup = itemServiceClient.isGroup(targetId);
+        if (isGroup) {
+            return CommentThreadType.GROUP;
+        }
+        boolean isItem = itemServiceClient.isItem(targetId);
+        if (isItem) {
+            return CommentThreadType.ITEM;
+        }
+        throw new ModelNotFoundException();
     }
 
 }
