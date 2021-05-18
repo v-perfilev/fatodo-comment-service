@@ -17,15 +17,15 @@ public interface ItemServiceClient {
     @PostMapping(value = "/api/permissions/item/{itemId}")
     boolean canReadItem(@PathVariable UUID itemId);
 
-    @GetMapping(value = "/api/permissions/is-group/{id}")
-    boolean isGroup(@PathVariable UUID id);
+    @GetMapping(value = "/api/check/is-group/{groupId}")
+    boolean isGroup(@PathVariable UUID groupId);
 
-    @GetMapping(value = "/api/permissions/is-item/{id}")
-    boolean isItem(@PathVariable UUID id);
+    @GetMapping(value = "/api/check/is-item/{itemId}")
+    boolean isItem(@PathVariable UUID itemId);
 
-    @GetMapping(value = "/api/permissions/groups/{id}/user-ids")
-    List<UUID> getGroupUserIdsById(@PathVariable UUID id);
+    @GetMapping(value = "/api/groups/{groupId}/user-ids")
+    List<UUID> getGroupUserIdsById(@PathVariable UUID groupId);
 
-    @GetMapping(value = "/api/permissions/items/{id}/user-ids")
-    List<UUID> getItemUserIdsById(@PathVariable UUID id);
+    @GetMapping(value = "/api/items/{itemId}/user-ids")
+    List<UUID> getItemUserIdsById(@PathVariable UUID itemId);
 }

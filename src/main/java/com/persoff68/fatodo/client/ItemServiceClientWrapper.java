@@ -42,27 +42,27 @@ public class ItemServiceClientWrapper implements ItemServiceClient {
     }
 
     @Override
-    public boolean isGroup(UUID id) {
+    public boolean isGroup(UUID groupId) {
         try {
-            return itemServiceClient.isGroup(id);
+            return itemServiceClient.isGroup(groupId);
         } catch (Exception e) {
             throw new ClientException();
         }
     }
 
     @Override
-    public boolean isItem(UUID id) {
+    public boolean isItem(UUID itemId) {
         try {
-            return itemServiceClient.isItem(id);
+            return itemServiceClient.isItem(itemId);
         } catch (Exception e) {
             throw new ClientException();
         }
     }
 
     @Override
-    public List<UUID> getGroupUserIdsById(UUID id) {
+    public List<UUID> getGroupUserIdsById(UUID groupId) {
         try {
-            return itemServiceClient.getGroupUserIdsById(id);
+            return itemServiceClient.getGroupUserIdsById(groupId);
         } catch (FeignException.NotFound e) {
             throw new ModelNotFoundException();
         } catch (Exception e) {
@@ -71,9 +71,9 @@ public class ItemServiceClientWrapper implements ItemServiceClient {
     }
 
     @Override
-    public List<UUID> getItemUserIdsById(UUID id) {
+    public List<UUID> getItemUserIdsById(UUID itemId) {
         try {
-            return itemServiceClient.getItemUserIdsById(id);
+            return itemServiceClient.getItemUserIdsById(itemId);
         } catch (FeignException.NotFound e) {
             throw new ModelNotFoundException();
         } catch (Exception e) {
