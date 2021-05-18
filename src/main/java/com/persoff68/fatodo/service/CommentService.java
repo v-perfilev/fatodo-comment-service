@@ -20,6 +20,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final CommentThreadService threadService;
     private final PermissionService permissionService;
+    private final WsService wsService;
     private final EntityManager entityManager;
 
     public List<Comment> getParentsByTargetIdPageable(UUID targetId, Pageable pageable) {
@@ -39,7 +40,12 @@ public class CommentService {
     public Comment addParent(UUID userId, UUID targetId, String text) {
         CommentThread tread = threadService.getByIdOrCreate(targetId);
         Comment comment = Comment.of(userId, tread, text);
-        return commentRepository.saveAndFlush(comment);
+        comment = commentRepository.save(comment);
+
+        // WS
+        wsService.sendCommentNewEvent(comment);
+
+        return comment;
     }
 
     @Transactional
@@ -51,6 +57,9 @@ public class CommentService {
         Comment comment = Comment.of(userId, parent, text);
         comment = commentRepository.saveAndFlush(comment);
         entityManager.refresh(parent);
+
+        // WS
+        wsService.sendCommentNewEvent(comment);
 
         return comment;
     }
@@ -69,6 +78,9 @@ public class CommentService {
             entityManager.refresh(parent);
         }
 
+        // WS
+        wsService.sendCommentUpdateEvent(comment);
+
         return comment;
     }
 
@@ -86,6 +98,9 @@ public class CommentService {
         if (parent != null) {
             entityManager.refresh(parent);
         }
+
+        // WS
+        wsService.sendCommentUpdateEvent(comment);
     }
 
 }
