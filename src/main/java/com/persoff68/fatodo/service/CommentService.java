@@ -4,6 +4,7 @@ import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
+import com.persoff68.fatodo.service.ws.WsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
