@@ -21,6 +21,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.contract.verifier.messaging.boot.AutoConfigureMessageVerifier;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -29,6 +31,7 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMessageVerifier
+@Transactional
 public abstract class ContractBase {
     private static final UUID USER_ID = UUID.fromString("8f9a7cae-73c8-4ad6-b135-5bd109b51d2e");
     private static final UUID THREAD_ID = UUID.fromString("b73e8418-ff4a-472b-893d-4e248ae93797");
@@ -44,6 +47,8 @@ public abstract class ContractBase {
     CommentRepository commentRepository;
     @Autowired
     ReactionRepository reactionRepository;
+    @Autowired
+    EntityManager entityManager;
 
     @MockBean
     ItemServiceClient itemServiceClient;
@@ -84,7 +89,8 @@ public abstract class ContractBase {
                 .parent(parent)
                 .userId(userId)
                 .build().toParent();
-        return commentRepository.saveAndFlush(comment);
+        entityManager.merge(comment);
+        return comment;
     }
 
     private void createReaction(UUID commentId, UUID userId) {
