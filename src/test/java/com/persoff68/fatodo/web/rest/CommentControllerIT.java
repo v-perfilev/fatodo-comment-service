@@ -71,23 +71,14 @@ public class CommentControllerIT {
         threadRepository.deleteAll();
         commentRepository.deleteAll();
 
-        thread1 = TestCommentThread.defaultBuilder().type(CommentThreadType.GROUP).build().toParent();
-        thread1 = threadRepository.saveAndFlush(thread1);
-
-        comment1 = TestComment.defaultBuilder().thread(thread1)
-                .userId(UUID.fromString(USER_ID_1)).build().toParent();
-        comment1 = commentRepository.saveAndFlush(comment1);
-
-        comment2 = TestComment.defaultBuilder().thread(thread1).parent(comment1)
-                .userId(UUID.fromString(USER_ID_1)).build().toParent();
-        comment2 = commentRepository.saveAndFlush(comment2);
-
-        comment3 = TestComment.defaultBuilder().thread(thread1)
-                .userId(UUID.fromString(USER_ID_2)).build().toParent();
-        comment3 = commentRepository.saveAndFlush(comment3);
+        thread1 = createCommentThread();
+        comment1 = createComment(thread1, null, USER_ID_1);
+        comment2 = createComment(thread1, comment1, USER_ID_1);
+        comment3 = createComment(thread1, null, USER_ID_2);
 
         doNothing().when(wsServiceClient).sendCommentNewEvent(any());
         doNothing().when(wsServiceClient).sendCommentUpdateEvent(any());
+        doNothing().when(wsServiceClient).sendReactionsEvent(any());
 
         when(itemServiceClient.canReadGroup(any())).thenReturn(true);
     }
@@ -392,6 +383,17 @@ public class CommentControllerIT {
         String url = ENDPOINT + "/" + comment3.getId();
         mvc.perform(delete(url))
                 .andExpect(status().isUnauthorized());
+    }
+
+    private CommentThread createCommentThread() {
+        CommentThread thread = TestCommentThread.defaultBuilder().type(CommentThreadType.GROUP).build().toParent();
+        return threadRepository.saveAndFlush(thread);
+    }
+
+    private Comment createComment(CommentThread thread, Comment parent, String userId) {
+        Comment comment = TestComment.defaultBuilder().thread(thread).parent(parent)
+                .userId(UUID.fromString(userId)).build().toParent();
+        return commentRepository.saveAndFlush(comment);
     }
 
 }
