@@ -13,6 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
 import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -25,7 +27,7 @@ public class WsServiceCT {
 
     @Test
     void testSendCommentNewEvent() {
-        CommentDTO commentDTO = TestCommentDTO.defaultBuilder().build().toParent();
+        CommentDTO commentDTO = TestCommentDTO.defaultBuilder().id(UUID.randomUUID()).build().toParent();
         WsEventDTO<CommentDTO> dto = TestWsEventDTO.<CommentDTO>defaultBuilder().content(commentDTO).build().toParent();
         wsServiceClient.sendCommentNewEvent(dto);
         assertThat(true).isTrue();
@@ -33,7 +35,7 @@ public class WsServiceCT {
 
     @Test
     void testSendCommentUpdateEvent() {
-        CommentDTO commentDTO = TestCommentDTO.defaultBuilder().build().toParent();
+        CommentDTO commentDTO = TestCommentDTO.defaultBuilder().id(UUID.randomUUID()).build().toParent();
         WsEventDTO<CommentDTO> dto = TestWsEventDTO.<CommentDTO>defaultBuilder().content(commentDTO).build().toParent();
         wsServiceClient.sendCommentUpdateEvent(dto);
         assertThat(true).isTrue();

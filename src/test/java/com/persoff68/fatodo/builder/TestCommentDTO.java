@@ -33,6 +33,7 @@ public class TestCommentDTO extends CommentDTO {
     public static TestCommentDTOBuilder defaultBuilder() {
         return TestCommentDTO.builder()
                 .text(DEFAULT_VALUE)
+                .threadId(UUID.randomUUID())
                 .userId(UUID.randomUUID());
     }
 
