@@ -3,6 +3,7 @@ package com.persoff68.fatodo.service;
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.repository.CommentRepository;
+import com.persoff68.fatodo.service.exception.ModelInvalidException;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.ws.WsService;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,9 @@ public class CommentService {
     public Comment addChild(UUID userId, UUID parentId, String text) {
         Comment parent = commentRepository.findById(parentId)
                 .orElseThrow(ModelNotFoundException::new);
+        if (parent.getParent() != null) {
+            throw new ModelInvalidException();
+        }
         permissionService.checkParentPermission(parent);
 
         Comment comment = Comment.of(userId, parent, text);

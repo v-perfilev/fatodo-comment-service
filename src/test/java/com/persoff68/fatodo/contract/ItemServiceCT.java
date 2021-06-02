@@ -56,5 +56,4 @@ public class ItemServiceCT {
         assertThat(userIdList).isNotEmpty();
     }
 
-
 }

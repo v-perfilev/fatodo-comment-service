@@ -7,6 +7,7 @@ import com.persoff68.fatodo.builder.TestComment;
 import com.persoff68.fatodo.builder.TestCommentThread;
 import com.persoff68.fatodo.builder.TestReaction;
 import com.persoff68.fatodo.client.ItemServiceClient;
+import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.Reaction;
@@ -28,6 +29,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -42,6 +44,7 @@ public class ReactionControllerIT {
 
     @Autowired
     MockMvc mvc;
+
     @Autowired
     CommentThreadRepository threadRepository;
     @Autowired
@@ -53,6 +56,8 @@ public class ReactionControllerIT {
 
     @MockBean
     ItemServiceClient itemServiceClient;
+    @MockBean
+    WsServiceClient wsServiceClient;
 
     Comment comment1;
     Comment comment2;
@@ -73,6 +78,8 @@ public class ReactionControllerIT {
 
         CommentThread thread2 = createThread();
         comment4 = createComment(thread2, USER_ID_2);
+
+        doNothing().when(wsServiceClient).sendReactionsEvent(any());
     }
 
     @Test

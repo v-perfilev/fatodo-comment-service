@@ -2,6 +2,7 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.FatodoCommentServiceApplication;
 import com.persoff68.fatodo.client.ItemServiceClient;
+import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.repository.CommentRepository;
@@ -21,6 +22,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = FatodoCommentServiceApplication.class)
@@ -35,7 +37,7 @@ public class CommentServiceIT {
     MockMvc mvc;
 
     @Autowired
-    CommentThreadRepository commentThreadRepository;
+    CommentThreadRepository threadRepository;
     @Autowired
     CommentRepository commentRepository;
     @Autowired
@@ -43,6 +45,8 @@ public class CommentServiceIT {
 
     @MockBean
     ItemServiceClient itemServiceClient;
+    @MockBean
+    WsServiceClient wsServiceClient;
 
     CommentThread thread;
     Comment parent;
@@ -51,12 +55,14 @@ public class CommentServiceIT {
 
     @BeforeEach
     public void setup() {
-        commentThreadRepository.deleteAll();
+        threadRepository.deleteAll();
         commentRepository.deleteAll();
 
         when(itemServiceClient.isGroup(any())).thenReturn(false);
         when(itemServiceClient.isItem(any())).thenReturn(true);
         when(itemServiceClient.canReadItem(any())).thenReturn(true);
+
+        doNothing().when(wsServiceClient).sendCommentNewEvent(any());
 
         this.parent = commentService.addParent(USER_1_ID, TARGET_ID, "test");
         this.child1 = commentService.addChild(USER_1_ID, this.parent.getId(), "test");

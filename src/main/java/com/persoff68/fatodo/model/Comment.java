@@ -39,7 +39,7 @@ public class Comment extends AbstractAuditingModel {
     @OneToMany(cascade = {CascadeType.REMOVE}, mappedBy = "comment", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Reaction> reactions = new ArrayList<>();
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
     private Comment parent;
 
     @OneToMany(mappedBy = "parent", cascade = {CascadeType.MERGE, CascadeType.REMOVE}, fetch = FetchType.EAGER)
