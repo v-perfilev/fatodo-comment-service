@@ -2,12 +2,15 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
+import com.persoff68.fatodo.model.dto.PageableList;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.service.exception.ModelInvalidException;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.ws.WsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -25,17 +28,19 @@ public class CommentService {
     private final WsService wsService;
     private final EntityManager entityManager;
 
-    public List<Comment> getParentsByTargetIdPageable(UUID targetId, Pageable pageable) {
+    public Pair<List<Comment>, Long> getParentsByTargetIdPageable(UUID targetId, Pageable pageable) {
         CommentThread thread = threadService.getById(targetId);
         permissionService.checkThreadPermission(thread);
-        return commentRepository.findParentCommentsByThreadId(targetId, pageable);
+        Page<Comment> commentPage = commentRepository.findParentCommentsByThreadId(targetId, pageable);
+        return Pair.of(commentPage.getContent(), commentPage.getTotalElements());
     }
 
-    public List<Comment> getChildrenByParentIdPageable(UUID parentId, Pageable pageable) {
+    public Pair<List<Comment>, Long> getChildrenByParentIdPageable(UUID parentId, Pageable pageable) {
         Comment parent = commentRepository.findById(parentId)
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.checkParentPermission(parent);
-        return commentRepository.findChildCommentsByThreadId(parentId, pageable);
+        Page<Comment> commentPage = commentRepository.findChildCommentsByThreadId(parentId, pageable);
+        return Pair.of(commentPage.getContent(), commentPage.getTotalElements());
     }
 
     @Transactional

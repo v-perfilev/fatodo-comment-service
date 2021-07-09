@@ -4,6 +4,7 @@ import com.persoff68.fatodo.model.AbstractAuditingModel;
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.dto.CommentDTO;
+import com.persoff68.fatodo.model.dto.PageableList;
 import com.persoff68.fatodo.model.dto.ReactionDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import org.mapstruct.InjectionStrategy;
@@ -47,19 +48,24 @@ public abstract class CommentMapper {
                 .collect(Collectors.toList())
                 : Collections.emptyList();
 
-        List<CommentDTO> childrenDTOList = comment.getChildren() != null
-                ? comment.getChildren().stream()
-                .sorted(Comparator.comparing(AbstractAuditingModel::getCreatedAt))
-                .limit(DEFAULT_CHILDREN_SIZE)
-                .map(this::pojoToDTO)
-                .collect(Collectors.toList())
-                : Collections.emptyList();
+        PageableList<CommentDTO> children;
+        if (comment.getChildren() != null) {
+            List<Comment> childrenList = comment.getChildren();
+            List<CommentDTO> childrenDTOList = childrenList.stream()
+                    .sorted(Comparator.comparing(AbstractAuditingModel::getCreatedAt))
+                    .limit(DEFAULT_CHILDREN_SIZE)
+                    .map(this::pojoToDTO)
+                    .collect(Collectors.toList());
+            children = PageableList.of(childrenDTOList, childrenList.size());
+        } else {
+            children = PageableList.empty();
+        }
 
         CommentDTO dto = defaultPojoToDTO(comment);
         dto.setThreadId(threadId);
         dto.setParentId(parentId);
         dto.setReactions(reactionDTOList);
-        dto.setChildren(childrenDTOList);
+        dto.setChildren(children);
         return dto;
     }
 

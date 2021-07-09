@@ -1,7 +1,7 @@
 package com.persoff68.fatodo.web.rest;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
 import com.persoff68.fatodo.FatodoCommentServiceApplication;
 import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.builder.TestComment;
@@ -12,6 +12,7 @@ import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.constant.CommentThreadType;
 import com.persoff68.fatodo.model.dto.CommentDTO;
+import com.persoff68.fatodo.model.dto.PageableList;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -90,9 +91,13 @@ public class CommentControllerIT {
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
-        CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, CommentDTO.class);
-        List<CommentDTO> resultDTOList = objectMapper.readValue(resultString, listType);
-        assertThat(resultDTOList.size()).isEqualTo(2);
+        JavaType javaType = objectMapper.getTypeFactory()
+                .constructParametricType(PageableList.class, CommentDTO.class);
+        PageableList<CommentDTO> resultPageableList = objectMapper.readValue(resultString, javaType);
+        List<CommentDTO> dtoList = resultPageableList.getData();
+        long count = resultPageableList.getCount();
+        assertThat(dtoList.size()).isEqualTo(2);
+        assertThat(count).isEqualTo(2);
     }
 
     @Test
@@ -102,9 +107,13 @@ public class CommentControllerIT {
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
-        CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, CommentDTO.class);
-        List<CommentDTO> resultDTOList = objectMapper.readValue(resultString, listType);
-        assertThat(resultDTOList.size()).isEqualTo(1);
+        JavaType javaType = objectMapper.getTypeFactory()
+                .constructParametricType(PageableList.class, CommentDTO.class);
+        PageableList<CommentDTO> resultPageableList = objectMapper.readValue(resultString, javaType);
+        List<CommentDTO> dtoList = resultPageableList.getData();
+        long count = resultPageableList.getCount();
+        assertThat(dtoList.size()).isEqualTo(1);
+        assertThat(count).isEqualTo(2);
     }
 
     @Test
@@ -122,9 +131,13 @@ public class CommentControllerIT {
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
-        CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, CommentDTO.class);
-        List<CommentDTO> resultDTOList = objectMapper.readValue(resultString, listType);
-        assertThat(resultDTOList.size()).isEqualTo(1);
+        JavaType javaType = objectMapper.getTypeFactory()
+                .constructParametricType(PageableList.class, CommentDTO.class);
+        PageableList<CommentDTO> resultPageableList = objectMapper.readValue(resultString, javaType);
+        List<CommentDTO> dtoList = resultPageableList.getData();
+        long count = resultPageableList.getCount();
+        assertThat(dtoList.size()).isEqualTo(1);
+        assertThat(count).isEqualTo(1);
     }
 
     @Test
@@ -134,9 +147,13 @@ public class CommentControllerIT {
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
-        CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, CommentDTO.class);
-        List<CommentDTO> resultDTOList = objectMapper.readValue(resultString, listType);
-        assertThat(resultDTOList.size()).isEqualTo(0);
+        JavaType javaType = objectMapper.getTypeFactory()
+                .constructParametricType(PageableList.class, CommentDTO.class);
+        PageableList<CommentDTO> resultPageableList = objectMapper.readValue(resultString, javaType);
+        List<CommentDTO> dtoList = resultPageableList.getData();
+        long count = resultPageableList.getCount();
+        assertThat(dtoList.size()).isEqualTo(0);
+        assertThat(count).isEqualTo(1);
     }
 
     @Test

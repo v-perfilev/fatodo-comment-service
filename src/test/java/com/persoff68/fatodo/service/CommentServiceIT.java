@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -81,18 +82,24 @@ public class CommentServiceIT {
 
     @Test
     public void testGetParentsByThreadId() {
-        List<Comment> commentList = commentService
+        Pair<List<Comment>, Long> pair = commentService
                 .getParentsByTargetIdPageable(this.thread.getId(), pageable);
-        assertThat(commentList.size()).isEqualTo(1);
-        assertThat(commentList.get(0).getChildren().size()).isEqualTo(2);
+        List<Comment> data = pair.getFirst();
+        long count = pair.getSecond();
+        assertThat(data.size()).isEqualTo(1);
+        assertThat(count).isEqualTo(1L);
+        assertThat(data.get(0).getChildren().size()).isEqualTo(2);
     }
 
     @Test
     public void testGetChildrenByParentId() {
-        List<Comment> commentList = commentService
+        Pair<List<Comment>, Long> pair = commentService
                 .getChildrenByParentIdPageable(this.parent.getId(), pageable);
-        assertThat(commentList.size()).isEqualTo(2);
-        commentList.forEach(comment -> {
+        List<Comment> data = pair.getFirst();
+        long count = pair.getSecond();
+        assertThat(data.size()).isEqualTo(2);
+        assertThat(count).isEqualTo(2L);
+        data.forEach(comment -> {
             assertThat(comment.getParent()).isNotNull();
             assertThat(comment.getChildren()).isEmpty();
         });

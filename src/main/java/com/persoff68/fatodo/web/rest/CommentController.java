@@ -2,6 +2,7 @@ package com.persoff68.fatodo.web.rest;
 
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.dto.CommentDTO;
+import com.persoff68.fatodo.model.dto.PageableList;
 import com.persoff68.fatodo.model.mapper.CommentMapper;
 import com.persoff68.fatodo.repository.OffsetPageRequest;
 import com.persoff68.fatodo.security.exception.UnauthorizedException;
@@ -9,6 +10,7 @@ import com.persoff68.fatodo.security.util.SecurityUtils;
 import com.persoff68.fatodo.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +42,7 @@ public class CommentController {
     private final CommentMapper commentMapper;
 
     @GetMapping("/{targetId}")
-    public ResponseEntity<List<CommentDTO>> getAllParentsPageable(
+    public ResponseEntity<PageableList<CommentDTO>> getAllParentsPageable(
             @PathVariable UUID targetId,
             @RequestParam(required = false) Integer offset,
             @RequestParam(required = false) Integer size
@@ -48,15 +50,16 @@ public class CommentController {
         offset = Optional.ofNullable(offset).orElse(0);
         size = Optional.ofNullable(size).orElse(DEFAULT_SIZE);
         Pageable pageRequest = OffsetPageRequest.of(offset, size);
-        List<Comment> commentList = commentService.getParentsByTargetIdPageable(targetId, pageRequest);
-        List<CommentDTO> dtoList = commentList.stream()
+        Pair<List<Comment>, Long> pair = commentService.getParentsByTargetIdPageable(targetId, pageRequest);
+        List<CommentDTO> dtoList = pair.getFirst().stream()
                 .map(commentMapper::pojoToDTO)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(dtoList);
+        PageableList<CommentDTO> dtoPageableList = PageableList.of(dtoList, pair.getSecond());
+        return ResponseEntity.ok(dtoPageableList);
     }
 
     @GetMapping("/{parentId}/children")
-    public ResponseEntity<List<CommentDTO>> getAllChildrenPageable(
+    public ResponseEntity<PageableList<CommentDTO>> getAllChildrenPageable(
             @PathVariable UUID parentId,
             @RequestParam(required = false) Integer offset,
             @RequestParam(required = false) Integer size
@@ -64,11 +67,12 @@ public class CommentController {
         offset = Optional.ofNullable(offset).orElse(0);
         size = Optional.ofNullable(size).orElse(DEFAULT_SIZE);
         Pageable pageRequest = OffsetPageRequest.of(offset, size);
-        List<Comment> commentList = commentService.getChildrenByParentIdPageable(parentId, pageRequest);
-        List<CommentDTO> dtoList = commentList.stream()
+        Pair<List<Comment>, Long> pair = commentService.getChildrenByParentIdPageable(parentId, pageRequest);
+        List<CommentDTO> dtoList = pair.getFirst().stream()
                 .map(commentMapper::pojoToDTO)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(dtoList);
+        PageableList<CommentDTO> dtoPageableList = PageableList.of(dtoList, pair.getSecond());
+        return ResponseEntity.ok(dtoPageableList);
     }
 
     @PostMapping("/{targetId}")

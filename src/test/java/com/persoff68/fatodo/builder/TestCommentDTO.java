@@ -1,6 +1,7 @@
 package com.persoff68.fatodo.builder;
 
 import com.persoff68.fatodo.model.dto.CommentDTO;
+import com.persoff68.fatodo.model.dto.PageableList;
 import com.persoff68.fatodo.model.dto.ReactionDTO;
 import lombok.Builder;
 
@@ -18,7 +19,7 @@ public class TestCommentDTO extends CommentDTO {
                           boolean isDeleted,
                           UUID parentId,
                           List<ReactionDTO> reactions,
-                          List<CommentDTO> children) {
+                          PageableList<CommentDTO> children) {
         super();
         super.setId(id);
         super.setThreadId(threadId);

@@ -20,5 +20,5 @@ public class CommentDTO extends AbstractAuditingDTO {
 
     private List<ReactionDTO> reactions;
 
-    private List<CommentDTO> children;
+    private PageableList<CommentDTO> children;
 }
