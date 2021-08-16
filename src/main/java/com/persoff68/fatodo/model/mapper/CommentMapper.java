@@ -42,12 +42,40 @@ public abstract class CommentMapper {
         Comment parent = comment.getParent();
         UUID parentId = parent != null ? parent.getId() : null;
 
-        List<ReactionDTO> reactionDTOList = comment.getReactions() != null
+        List<ReactionDTO> reactionList = getReactionList(comment);
+
+        PageableList<CommentDTO> children = getChildrenList(comment);
+
+        CommentDTO dto = defaultPojoToDTO(comment);
+        dto.setThreadId(threadId);
+        dto.setParentId(parentId);
+        dto.setReactions(reactionList);
+        dto.setChildren(children);
+        return dto;
+    }
+
+    public ReactionsDTO pojoToReactionsDTO(Comment comment) {
+        CommentThread thread = comment.getThread();
+        UUID threadId = thread != null ? thread.getId() : null;
+
+        List<ReactionDTO> reactionList = getReactionList(comment);
+
+        ReactionsDTO dto = new ReactionsDTO();
+        dto.setThreadId(threadId);
+        dto.setCommentId(comment.getId());
+        dto.setReactions(reactionList);
+        return dto;
+    }
+
+    private List<ReactionDTO> getReactionList(Comment comment) {
+        return comment.getReactions() != null
                 ? comment.getReactions().stream()
                 .map(reactionMapper::pojoToDTO)
                 .collect(Collectors.toList())
                 : Collections.emptyList();
+    }
 
+    private PageableList<CommentDTO> getChildrenList(Comment comment) {
         PageableList<CommentDTO> children;
         if (comment.getChildren() != null) {
             List<Comment> childrenList = comment.getChildren();
@@ -60,30 +88,7 @@ public abstract class CommentMapper {
         } else {
             children = PageableList.empty();
         }
-
-        CommentDTO dto = defaultPojoToDTO(comment);
-        dto.setThreadId(threadId);
-        dto.setParentId(parentId);
-        dto.setReactions(reactionDTOList);
-        dto.setChildren(children);
-        return dto;
-    }
-
-    public ReactionsDTO pojoToReactionsDTO(Comment comment) {
-        CommentThread thread = comment.getThread();
-        UUID threadId = thread != null ? thread.getId() : null;
-
-        List<ReactionDTO> reactionDTOList = comment.getReactions() != null
-                ? comment.getReactions().stream()
-                .map(reactionMapper::pojoToDTO)
-                .collect(Collectors.toList())
-                : Collections.emptyList();
-
-        ReactionsDTO dto = new ReactionsDTO();
-        dto.setThreadId(threadId);
-        dto.setCommentId(comment.getId());
-        dto.setReactions(reactionDTOList);
-        return dto;
+        return children;
     }
 
 }
