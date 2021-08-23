@@ -17,6 +17,7 @@ public class TestComment extends Comment {
                        String text,
                        boolean isDeleted,
                        Comment parent,
+                       Comment reference,
                        List<Comment> children) {
         super();
         super.setId(id);
@@ -25,6 +26,7 @@ public class TestComment extends Comment {
         super.setText(text);
         super.setDeleted(isDeleted);
         super.setParent(parent);
+        super.setReference(reference);
         super.setChildren(children);
     }
 
@@ -42,6 +44,7 @@ public class TestComment extends Comment {
         comment.setText(getText());
         comment.setDeleted(isDeleted());
         comment.setParent(getParent());
+        comment.setReference(getReference());
         comment.setChildren(getChildren());
         return comment;
     }

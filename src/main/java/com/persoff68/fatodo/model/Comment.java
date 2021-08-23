@@ -42,6 +42,9 @@ public class Comment extends AbstractAuditingModel {
     @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
     private Comment parent;
 
+    @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
+    private Comment reference;
+
     @OneToMany(mappedBy = "parent", cascade = {CascadeType.MERGE, CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private List<Comment> children = new ArrayList<>();
 
@@ -53,13 +56,14 @@ public class Comment extends AbstractAuditingModel {
         return comment;
     }
 
-    public static Comment of(UUID userId, Comment parent, String text) {
+    public static Comment of(UUID userId, Comment parent, Comment reference, String text) {
         CommentThread thread = parent.getThread();
         Comment comment = new Comment();
         comment.setUserId(userId);
         comment.setThread(thread);
         comment.setText(text);
         comment.setParent(parent);
+        comment.setReference(reference);
         return comment;
     }
 

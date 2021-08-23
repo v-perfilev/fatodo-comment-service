@@ -7,6 +7,7 @@ import com.persoff68.fatodo.model.dto.CommentDTO;
 import com.persoff68.fatodo.model.dto.PageableList;
 import com.persoff68.fatodo.model.dto.ReactionDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
+import com.persoff68.fatodo.model.dto.ReferenceCommentDTO;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -32,6 +33,8 @@ public abstract class CommentMapper {
     @Mapping(target = "children", ignore = true)
     abstract CommentDTO defaultPojoToDTO(Comment comment);
 
+    abstract ReferenceCommentDTO defaultPojoToReferenceDTO(Comment comment);
+
     public CommentDTO pojoToDTO(Comment comment) {
         if (comment == null) {
             return null;
@@ -42,6 +45,9 @@ public abstract class CommentMapper {
         Comment parent = comment.getParent();
         UUID parentId = parent != null ? parent.getId() : null;
 
+        Comment reference = comment.getReference();
+        ReferenceCommentDTO referenceDTO = reference != null ? defaultPojoToReferenceDTO(reference) : null;
+
         List<ReactionDTO> reactionList = getReactionList(comment);
 
         PageableList<CommentDTO> children = getChildrenList(comment);
@@ -49,6 +55,7 @@ public abstract class CommentMapper {
         CommentDTO dto = defaultPojoToDTO(comment);
         dto.setThreadId(threadId);
         dto.setParentId(parentId);
+        dto.setReference(referenceDTO);
         dto.setReactions(reactionList);
         dto.setChildren(children);
         return dto;

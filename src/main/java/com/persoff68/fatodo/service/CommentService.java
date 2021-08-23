@@ -2,9 +2,7 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
-import com.persoff68.fatodo.model.dto.PageableList;
 import com.persoff68.fatodo.repository.CommentRepository;
-import com.persoff68.fatodo.service.exception.ModelInvalidException;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.ws.WsService;
 import lombok.RequiredArgsConstructor;
@@ -56,15 +54,16 @@ public class CommentService {
     }
 
     @Transactional
-    public Comment addChild(UUID userId, UUID parentId, String text) {
-        Comment parent = commentRepository.findById(parentId)
+    public Comment addChild(UUID userId, UUID referenceId, String text) {
+        Comment reference = commentRepository.findById(referenceId)
                 .orElseThrow(ModelNotFoundException::new);
-        if (parent.getParent() != null) {
-            throw new ModelInvalidException();
-        }
+        Comment parent = reference.getParent() != null
+                ? reference.getParent()
+                : reference;
+
         permissionService.checkParentPermission(parent);
 
-        Comment comment = Comment.of(userId, parent, text);
+        Comment comment = Comment.of(userId, parent, reference, text);
         comment = commentRepository.saveAndFlush(comment);
         entityManager.refresh(parent);
 

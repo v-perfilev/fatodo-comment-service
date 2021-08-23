@@ -84,11 +84,11 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
-    @PostMapping("/{parentId}/child")
-    public ResponseEntity<CommentDTO> addChild(@PathVariable UUID parentId,
+    @PostMapping("/{referenceId}/child")
+    public ResponseEntity<CommentDTO> addChild(@PathVariable UUID referenceId,
                                                @RequestBody String text) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
-        Comment comment = commentService.addChild(userId, parentId, text);
+        Comment comment = commentService.addChild(userId, referenceId, text);
         CommentDTO dto = commentMapper.pojoToDTO(comment);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }

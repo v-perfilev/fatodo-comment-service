@@ -12,6 +12,7 @@ import java.util.UUID;
 public class CommentDTO extends AbstractAuditingDTO {
     private UUID threadId;
     private UUID parentId;
+    private ReferenceCommentDTO reference;
     private UUID userId;
     private String text;
 

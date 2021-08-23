@@ -271,17 +271,6 @@ public class CommentControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testAddChild_badRequest_parentHasParent() throws Exception {
-        String url = ENDPOINT + "/" + comment2.getId() + "/child";
-        String requestBody = "test_text";
-        mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithCustomSecurityContext(id = USER_ID_1)
     void testAddChild_notFound() throws Exception {
         String url = ENDPOINT + "/" + UUID.randomUUID() + "/child";
         String requestBody = "test_text";
@@ -408,7 +397,7 @@ public class CommentControllerIT {
     }
 
     private Comment createComment(CommentThread thread, Comment parent, String userId) {
-        Comment comment = TestComment.defaultBuilder().thread(thread).parent(parent)
+        Comment comment = TestComment.defaultBuilder().thread(thread).parent(parent).reference(parent)
                 .userId(UUID.fromString(userId)).build().toParent();
         return commentRepository.saveAndFlush(comment);
     }

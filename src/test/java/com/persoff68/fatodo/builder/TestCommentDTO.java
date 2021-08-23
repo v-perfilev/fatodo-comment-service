@@ -3,6 +3,7 @@ package com.persoff68.fatodo.builder;
 import com.persoff68.fatodo.model.dto.CommentDTO;
 import com.persoff68.fatodo.model.dto.PageableList;
 import com.persoff68.fatodo.model.dto.ReactionDTO;
+import com.persoff68.fatodo.model.dto.ReferenceCommentDTO;
 import lombok.Builder;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class TestCommentDTO extends CommentDTO {
                           String text,
                           boolean isDeleted,
                           UUID parentId,
+                          ReferenceCommentDTO reference,
                           List<ReactionDTO> reactions,
                           PageableList<CommentDTO> children) {
         super();
@@ -27,6 +29,7 @@ public class TestCommentDTO extends CommentDTO {
         super.setText(text);
         super.setDeleted(isDeleted);
         super.setParentId(parentId);
+        super.setReference(reference);
         super.setReactions(reactions);
         super.setChildren(children);
     }
@@ -46,6 +49,7 @@ public class TestCommentDTO extends CommentDTO {
         dto.setText(getText());
         dto.setDeleted(isDeleted());
         dto.setParentId(getParentId());
+        dto.setReference(getReference());
         dto.setReactions(getReactions());
         dto.setChildren(getChildren());
         return dto;
