@@ -4,7 +4,6 @@ import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import lombok.Builder;
 
-import java.util.List;
 import java.util.UUID;
 
 public class TestComment extends Comment {
@@ -16,18 +15,14 @@ public class TestComment extends Comment {
                        UUID userId,
                        String text,
                        boolean isDeleted,
-                       Comment parent,
-                       Comment reference,
-                       List<Comment> children) {
+                       Comment reference) {
         super();
         super.setId(id);
         super.setThread(thread);
         super.setUserId(userId);
         super.setText(text);
         super.setDeleted(isDeleted);
-        super.setParent(parent);
         super.setReference(reference);
-        super.setChildren(children);
     }
 
     public static TestCommentBuilder defaultBuilder() {
@@ -43,9 +38,7 @@ public class TestComment extends Comment {
         comment.setUserId(getUserId());
         comment.setText(getText());
         comment.setDeleted(isDeleted());
-        comment.setParent(getParent());
         comment.setReference(getReference());
-        comment.setChildren(getChildren());
         return comment;
     }
 

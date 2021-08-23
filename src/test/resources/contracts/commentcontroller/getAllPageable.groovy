@@ -3,7 +3,7 @@ package contracts.commentcontroller
 import org.springframework.cloud.contract.spec.Contract
 
 Contract.make {
-    name 'get pageable parents by thread id'
+    name 'get pageable comments by thread id'
     description 'should return status 200 and list of CommentDTO'
     request {
         method GET()

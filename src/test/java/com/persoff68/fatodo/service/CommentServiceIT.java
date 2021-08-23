@@ -50,9 +50,9 @@ public class CommentServiceIT {
     WsServiceClient wsServiceClient;
 
     CommentThread thread;
-    Comment parent;
-    Comment child1;
-    Comment child2;
+    Comment comment1;
+    Comment comment2;
+    Comment comment3;
 
     @BeforeEach
     public void setup() {
@@ -65,44 +65,28 @@ public class CommentServiceIT {
 
         doNothing().when(wsServiceClient).sendCommentNewEvent(any());
 
-        this.parent = commentService.addParent(USER_1_ID, TARGET_ID, "test");
-        this.child1 = commentService.addChild(USER_1_ID, this.parent.getId(), "test");
-        this.child2 = commentService.addChild(USER_2_ID, this.parent.getId(), "test");
-        this.thread = this.parent.getThread();
+        this.comment1 = commentService.add(USER_1_ID, TARGET_ID, "test");
+        this.comment2 = commentService.addWithReference(USER_1_ID, this.comment1.getId(), "test");
+        this.comment3 = commentService.addWithReference(USER_2_ID, this.comment1.getId(), "test");
+        this.thread = this.comment1.getThread();
     }
 
     @Test
     public void testAllCommentsAreInDb() {
         List<Comment> commentList = commentRepository.findAll();
-        Comment parent = commentRepository.findById(this.parent.getId()).orElse(null);
+        Comment comment = commentRepository.findById(this.comment1.getId()).orElse(null);
         assertThat(commentList.size()).isEqualTo(3);
-        assertThat(parent).isNotNull();
-        assertThat(parent.getChildren().size()).isEqualTo(2);
+        assertThat(comment).isNotNull();
     }
 
     @Test
-    public void testGetParentsByThreadId() {
+    public void testGetAllByThreadId() {
         Pair<List<Comment>, Long> pair = commentService
-                .getParentsByTargetIdPageable(this.thread.getId(), pageable);
+                .getAllByTargetIdPageable(this.thread.getId(), pageable);
         List<Comment> data = pair.getFirst();
         long count = pair.getSecond();
-        assertThat(data.size()).isEqualTo(1);
-        assertThat(count).isEqualTo(1L);
-        assertThat(data.get(0).getChildren().size()).isEqualTo(2);
-    }
-
-    @Test
-    public void testGetChildrenByParentId() {
-        Pair<List<Comment>, Long> pair = commentService
-                .getChildrenByParentIdPageable(this.parent.getId(), pageable);
-        List<Comment> data = pair.getFirst();
-        long count = pair.getSecond();
-        assertThat(data.size()).isEqualTo(2);
-        assertThat(count).isEqualTo(2L);
-        data.forEach(comment -> {
-            assertThat(comment.getParent()).isNotNull();
-            assertThat(comment.getChildren()).isEmpty();
-        });
+        assertThat(data.size()).isEqualTo(3);
+        assertThat(count).isEqualTo(3L);
     }
 
 }

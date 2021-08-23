@@ -42,7 +42,7 @@ public class CommentController {
     private final CommentMapper commentMapper;
 
     @GetMapping("/{targetId}")
-    public ResponseEntity<PageableList<CommentDTO>> getAllParentsPageable(
+    public ResponseEntity<PageableList<CommentDTO>> getAllPageable(
             @PathVariable UUID targetId,
             @RequestParam(required = false) Integer offset,
             @RequestParam(required = false) Integer size
@@ -50,24 +50,7 @@ public class CommentController {
         offset = Optional.ofNullable(offset).orElse(0);
         size = Optional.ofNullable(size).orElse(DEFAULT_SIZE);
         Pageable pageRequest = OffsetPageRequest.of(offset, size);
-        Pair<List<Comment>, Long> pair = commentService.getParentsByTargetIdPageable(targetId, pageRequest);
-        List<CommentDTO> dtoList = pair.getFirst().stream()
-                .map(commentMapper::pojoToDTO)
-                .collect(Collectors.toList());
-        PageableList<CommentDTO> dtoPageableList = PageableList.of(dtoList, pair.getSecond());
-        return ResponseEntity.ok(dtoPageableList);
-    }
-
-    @GetMapping("/{parentId}/children")
-    public ResponseEntity<PageableList<CommentDTO>> getAllChildrenPageable(
-            @PathVariable UUID parentId,
-            @RequestParam(required = false) Integer offset,
-            @RequestParam(required = false) Integer size
-    ) {
-        offset = Optional.ofNullable(offset).orElse(0);
-        size = Optional.ofNullable(size).orElse(DEFAULT_SIZE);
-        Pageable pageRequest = OffsetPageRequest.of(offset, size);
-        Pair<List<Comment>, Long> pair = commentService.getChildrenByParentIdPageable(parentId, pageRequest);
+        Pair<List<Comment>, Long> pair = commentService.getAllByTargetIdPageable(targetId, pageRequest);
         List<CommentDTO> dtoList = pair.getFirst().stream()
                 .map(commentMapper::pojoToDTO)
                 .collect(Collectors.toList());
@@ -76,19 +59,19 @@ public class CommentController {
     }
 
     @PostMapping("/{targetId}")
-    public ResponseEntity<CommentDTO> addParent(@PathVariable UUID targetId,
-                                                @RequestBody String text) {
+    public ResponseEntity<CommentDTO> add(@PathVariable UUID targetId,
+                                          @RequestBody String text) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
-        Comment comment = commentService.addParent(userId, targetId, text);
+        Comment comment = commentService.add(userId, targetId, text);
         CommentDTO dto = commentMapper.pojoToDTO(comment);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
-    @PostMapping("/{referenceId}/child")
-    public ResponseEntity<CommentDTO> addChild(@PathVariable UUID referenceId,
-                                               @RequestBody String text) {
+    @PostMapping("/{referenceId}/reference")
+    public ResponseEntity<CommentDTO> addWithReference(@PathVariable UUID referenceId,
+                                                       @RequestBody String text) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
-        Comment comment = commentService.addChild(userId, referenceId, text);
+        Comment comment = commentService.addWithReference(userId, referenceId, text);
         CommentDTO dto = commentMapper.pojoToDTO(comment);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }

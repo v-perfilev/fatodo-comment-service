@@ -15,17 +15,10 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
 
     @Query("""
             select distinct c from Comment c
-            where c.thread.id = :threadId and c.parent.id is null
+            where c.thread.id = :threadId
             order by c.createdAt desc
             """)
-    Page<Comment> findParentCommentsByThreadId(@Param("threadId") UUID threadId, Pageable pageable);
-
-    @Query("""
-            select distinct c from Comment c
-            where c.parent.id = :threadId
-            order by c.createdAt desc
-            """)
-    Page<Comment> findChildCommentsByThreadId(@Param("threadId") UUID threadId, Pageable pageable);
+    Page<Comment> findAllByThreadId(@Param("threadId") UUID threadId, Pageable pageable);
 
 }
 

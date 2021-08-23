@@ -63,9 +63,11 @@ public class CommentControllerIT {
     WsServiceClient wsServiceClient;
 
     CommentThread thread1;
+    CommentThread thread2;
     Comment comment1;
     Comment comment2;
     Comment comment3;
+    Comment comment4;
 
     @BeforeEach
     public void setup() {
@@ -73,9 +75,11 @@ public class CommentControllerIT {
         commentRepository.deleteAll();
 
         thread1 = createCommentThread();
+        thread2 = createCommentThread();
         comment1 = createComment(thread1, null, USER_ID_1);
         comment2 = createComment(thread1, comment1, USER_ID_1);
         comment3 = createComment(thread1, null, USER_ID_2);
+        comment4 = createComment(thread2, null, USER_ID_1);
 
         doNothing().when(wsServiceClient).sendCommentNewEvent(any());
         doNothing().when(wsServiceClient).sendCommentUpdateEvent(any());
@@ -86,7 +90,7 @@ public class CommentControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testGetAllParentsPageable_ok_withoutParams() throws Exception {
+    void testGetAllPageable_ok_withoutParams() throws Exception {
         String url = ENDPOINT + "/" + thread1.getId();
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
@@ -96,13 +100,13 @@ public class CommentControllerIT {
         PageableList<CommentDTO> resultPageableList = objectMapper.readValue(resultString, javaType);
         List<CommentDTO> dtoList = resultPageableList.getData();
         long count = resultPageableList.getCount();
-        assertThat(dtoList.size()).isEqualTo(2);
-        assertThat(count).isEqualTo(2);
+        assertThat(dtoList.size()).isEqualTo(3);
+        assertThat(count).isEqualTo(3);
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testGetAllParentsPageable_ok_withParams() throws Exception {
+    void testGetAllPageable_ok_withParams() throws Exception {
         String url = ENDPOINT + "/" + thread1.getId() + "?offset=1&size=10";
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
@@ -112,13 +116,13 @@ public class CommentControllerIT {
         PageableList<CommentDTO> resultPageableList = objectMapper.readValue(resultString, javaType);
         List<CommentDTO> dtoList = resultPageableList.getData();
         long count = resultPageableList.getCount();
-        assertThat(dtoList.size()).isEqualTo(1);
-        assertThat(count).isEqualTo(2);
+        assertThat(dtoList.size()).isEqualTo(2);
+        assertThat(count).isEqualTo(3);
     }
 
     @Test
     @WithAnonymousUser
-    void testGetAllParentsPageable_unauthorized() throws Exception {
+    void testGetAllPageable_unauthorized() throws Exception {
         String url = ENDPOINT + "/" + thread1.getId();
         mvc.perform(get(url))
                 .andExpect(status().isUnauthorized());
@@ -126,52 +130,12 @@ public class CommentControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testGetAllChildrenPageable_ok_withoutParams() throws Exception {
-        String url = ENDPOINT + "/" + comment1.getId() + "/children";
-        ResultActions resultActions = mvc.perform(get(url))
-                .andExpect(status().isOk());
-        String resultString = resultActions.andReturn().getResponse().getContentAsString();
-        JavaType javaType = objectMapper.getTypeFactory()
-                .constructParametricType(PageableList.class, CommentDTO.class);
-        PageableList<CommentDTO> resultPageableList = objectMapper.readValue(resultString, javaType);
-        List<CommentDTO> dtoList = resultPageableList.getData();
-        long count = resultPageableList.getCount();
-        assertThat(dtoList.size()).isEqualTo(1);
-        assertThat(count).isEqualTo(1);
-    }
-
-    @Test
-    @WithCustomSecurityContext(id = USER_ID_1)
-    void testGetAllChildrenPageable_ok_withParams() throws Exception {
-        String url = ENDPOINT + "/" + comment1.getId() + "/children?offset=1&size=10";
-        ResultActions resultActions = mvc.perform(get(url))
-                .andExpect(status().isOk());
-        String resultString = resultActions.andReturn().getResponse().getContentAsString();
-        JavaType javaType = objectMapper.getTypeFactory()
-                .constructParametricType(PageableList.class, CommentDTO.class);
-        PageableList<CommentDTO> resultPageableList = objectMapper.readValue(resultString, javaType);
-        List<CommentDTO> dtoList = resultPageableList.getData();
-        long count = resultPageableList.getCount();
-        assertThat(dtoList.size()).isEqualTo(0);
-        assertThat(count).isEqualTo(1);
-    }
-
-    @Test
-    @WithAnonymousUser
-    void testGetAllChildrenPageable_unauthorized() throws Exception {
-        String url = ENDPOINT + "/" + comment1.getId() + "/children";
-        mvc.perform(get(url))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @WithCustomSecurityContext(id = USER_ID_1)
-    void testAddParent_ok_existingThread() throws Exception {
+    void testAdd_ok_existingThread() throws Exception {
         String url = ENDPOINT + "/" + thread1.getId();
         String requestBody = "test_text";
         ResultActions resultActions = mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isCreated());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CommentDTO dto = objectMapper.readValue(resultString, CommentDTO.class);
@@ -181,7 +145,7 @@ public class CommentControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testAddParent_ok_newThread() throws Exception {
+    void testAdd_ok_newThread() throws Exception {
         UUID newThreadId = UUID.randomUUID();
         when(itemServiceClient.isGroup(newThreadId)).thenReturn(false);
         when(itemServiceClient.isItem(newThreadId)).thenReturn(true);
@@ -189,8 +153,8 @@ public class CommentControllerIT {
         String url = ENDPOINT + "/" + newThreadId;
         String requestBody = "test_text";
         ResultActions resultActions = mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isCreated());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CommentDTO dto = objectMapper.readValue(resultString, CommentDTO.class);
@@ -200,7 +164,7 @@ public class CommentControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testAddParent_badRequest_wrongPermission() throws Exception {
+    void testAdd_badRequest_wrongPermission() throws Exception {
         UUID newThreadId = UUID.randomUUID();
         when(itemServiceClient.isGroup(newThreadId)).thenReturn(false);
         when(itemServiceClient.isItem(newThreadId)).thenReturn(true);
@@ -208,86 +172,86 @@ public class CommentControllerIT {
         String url = ENDPOINT + "/" + newThreadId;
         String requestBody = "test_text";
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testAddParent_notFound() throws Exception {
+    void testAdd_notFound() throws Exception {
         UUID newThreadId = UUID.randomUUID();
         when(itemServiceClient.isGroup(newThreadId)).thenReturn(false);
         when(itemServiceClient.isItem(newThreadId)).thenReturn(false);
         String url = ENDPOINT + "/" + newThreadId;
         String requestBody = "test_text";
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @WithAnonymousUser
-    void testAddParent_unauthorized() throws Exception {
+    void testAdd_unauthorized() throws Exception {
         UUID newThreadId = UUID.randomUUID();
         when(itemServiceClient.isGroup(newThreadId)).thenReturn(false);
         when(itemServiceClient.isItem(newThreadId)).thenReturn(false);
         String url = ENDPOINT + "/" + newThreadId;
         String requestBody = "test_text";
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testAddChild_ok() throws Exception {
-        String url = ENDPOINT + "/" + comment1.getId() + "/child";
+    void testAddWithReference_ok() throws Exception {
+        String url = ENDPOINT + "/" + comment1.getId() + "/reference";
         String requestBody = "test_text";
         ResultActions resultActions = mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isCreated());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CommentDTO dto = objectMapper.readValue(resultString, CommentDTO.class);
         assertThat(dto.getText()).isEqualTo(requestBody);
-        assertThat(dto.getParentId()).isEqualTo(comment1.getId());
+        assertThat(dto.getReference().getId()).isEqualTo(comment1.getId());
         assertThat(dto.getUserId().toString()).isEqualTo(USER_ID_1);
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testAddChild_badRequest_wrongPermission() throws Exception {
+    void testAddWithReference_badRequest_wrongPermission() throws Exception {
         when(itemServiceClient.canReadGroup(any())).thenReturn(false);
-        String url = ENDPOINT + "/" + comment1.getId() + "/child";
+        String url = ENDPOINT + "/" + comment1.getId() + "/reference";
         String requestBody = "test_text";
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testAddChild_notFound() throws Exception {
-        String url = ENDPOINT + "/" + UUID.randomUUID() + "/child";
+    void testAddWithReference_notFound() throws Exception {
+        String url = ENDPOINT + "/" + UUID.randomUUID() + "/reference";
         String requestBody = "test_text";
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @WithAnonymousUser
-    void testAddChild_unauthorized() throws Exception {
-        String url = ENDPOINT + "/" + comment1.getId() + "/child";
+    void testAddWithReference_unauthorized() throws Exception {
+        String url = ENDPOINT + "/" + thread1.getId() + "/" + comment1.getId();
         String requestBody = "test_text";
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -297,8 +261,8 @@ public class CommentControllerIT {
         String url = ENDPOINT + "/" + comment1.getId();
         String requestBody = "new_test_text";
         ResultActions resultActions = mvc.perform(put(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CommentDTO dto = objectMapper.readValue(resultString, CommentDTO.class);
@@ -311,8 +275,8 @@ public class CommentControllerIT {
         String url = ENDPOINT + "/" + comment3.getId();
         String requestBody = "new_test_text";
         mvc.perform(put(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
@@ -323,8 +287,8 @@ public class CommentControllerIT {
         String url = ENDPOINT + "/" + comment3.getId();
         String requestBody = "new_test_text";
         mvc.perform(put(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
@@ -334,8 +298,8 @@ public class CommentControllerIT {
         String url = ENDPOINT + "/" + UUID.randomUUID();
         String requestBody = "new_test_text";
         mvc.perform(put(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isNotFound());
     }
 
@@ -345,8 +309,8 @@ public class CommentControllerIT {
         String url = ENDPOINT + "/" + comment3.getId();
         String requestBody = "new_test_text";
         mvc.perform(put(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -396,8 +360,8 @@ public class CommentControllerIT {
         return threadRepository.saveAndFlush(thread);
     }
 
-    private Comment createComment(CommentThread thread, Comment parent, String userId) {
-        Comment comment = TestComment.defaultBuilder().thread(thread).parent(parent).reference(parent)
+    private Comment createComment(CommentThread thread, Comment reference, String userId) {
+        Comment comment = TestComment.defaultBuilder().thread(thread).reference(reference)
                 .userId(UUID.fromString(userId)).build().toParent();
         return commentRepository.saveAndFlush(comment);
     }

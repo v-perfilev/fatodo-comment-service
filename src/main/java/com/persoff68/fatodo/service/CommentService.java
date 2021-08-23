@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
@@ -24,27 +23,18 @@ public class CommentService {
     private final CommentThreadService threadService;
     private final PermissionService permissionService;
     private final WsService wsService;
-    private final EntityManager entityManager;
 
-    public Pair<List<Comment>, Long> getParentsByTargetIdPageable(UUID targetId, Pageable pageable) {
+    public Pair<List<Comment>, Long> getAllByTargetIdPageable(UUID targetId, Pageable pageable) {
         CommentThread thread = threadService.getById(targetId);
         permissionService.checkThreadPermission(thread);
-        Page<Comment> commentPage = commentRepository.findParentCommentsByThreadId(targetId, pageable);
-        return Pair.of(commentPage.getContent(), commentPage.getTotalElements());
-    }
-
-    public Pair<List<Comment>, Long> getChildrenByParentIdPageable(UUID parentId, Pageable pageable) {
-        Comment parent = commentRepository.findById(parentId)
-                .orElseThrow(ModelNotFoundException::new);
-        permissionService.checkParentPermission(parent);
-        Page<Comment> commentPage = commentRepository.findChildCommentsByThreadId(parentId, pageable);
+        Page<Comment> commentPage = commentRepository.findAllByThreadId(targetId, pageable);
         return Pair.of(commentPage.getContent(), commentPage.getTotalElements());
     }
 
     @Transactional
-    public Comment addParent(UUID userId, UUID targetId, String text) {
-        CommentThread tread = threadService.getByIdOrCreate(targetId);
-        Comment comment = Comment.of(userId, tread, text);
+    public Comment add(UUID userId, UUID targetId, String text) {
+        CommentThread thread = threadService.getByIdOrCreate(targetId);
+        Comment comment = Comment.of(userId, thread, text);
         comment = commentRepository.save(comment);
 
         // WS
@@ -54,18 +44,15 @@ public class CommentService {
     }
 
     @Transactional
-    public Comment addChild(UUID userId, UUID referenceId, String text) {
+    public Comment addWithReference(UUID userId, UUID referenceId, String text) {
         Comment reference = commentRepository.findById(referenceId)
                 .orElseThrow(ModelNotFoundException::new);
-        Comment parent = reference.getParent() != null
-                ? reference.getParent()
-                : reference;
+        CommentThread thread = reference.getThread();
 
-        permissionService.checkParentPermission(parent);
+        permissionService.checkThreadPermission(thread);
 
-        Comment comment = Comment.of(userId, parent, reference, text);
-        comment = commentRepository.saveAndFlush(comment);
-        entityManager.refresh(parent);
+        Comment comment = Comment.of(userId, thread, reference, text);
+        comment = commentRepository.save(comment);
 
         // WS
         wsService.sendCommentNewEvent(comment);
@@ -82,11 +69,6 @@ public class CommentService {
         comment.setText(text);
         comment = commentRepository.save(comment);
 
-        Comment parent = comment.getParent();
-        if (parent != null) {
-            entityManager.refresh(parent);
-        }
-
         // WS
         wsService.sendCommentUpdateEvent(comment);
 
@@ -102,11 +84,6 @@ public class CommentService {
         comment.setText(null);
         comment.setDeleted(true);
         commentRepository.save(comment);
-
-        Comment parent = comment.getParent();
-        if (parent != null) {
-            entityManager.refresh(parent);
-        }
 
         // WS
         wsService.sendCommentUpdateEvent(comment);

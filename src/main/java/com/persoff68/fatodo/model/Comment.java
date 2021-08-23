@@ -23,7 +23,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@ToString(exclude = {"thread", "children"})
+@ToString(exclude = {"thread"})
 public class Comment extends AbstractAuditingModel {
 
     @ManyToOne
@@ -40,13 +40,7 @@ public class Comment extends AbstractAuditingModel {
     private List<Reaction> reactions = new ArrayList<>();
 
     @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
-    private Comment parent;
-
-    @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
     private Comment reference;
-
-    @OneToMany(mappedBy = "parent", cascade = {CascadeType.MERGE, CascadeType.REMOVE}, fetch = FetchType.EAGER)
-    private List<Comment> children = new ArrayList<>();
 
     public static Comment of(UUID userId, CommentThread thread, String text) {
         Comment comment = new Comment();
@@ -56,13 +50,11 @@ public class Comment extends AbstractAuditingModel {
         return comment;
     }
 
-    public static Comment of(UUID userId, Comment parent, Comment reference, String text) {
-        CommentThread thread = parent.getThread();
+    public static Comment of(UUID userId, CommentThread thread, Comment reference, String text) {
         Comment comment = new Comment();
         comment.setUserId(userId);
         comment.setThread(thread);
         comment.setText(text);
-        comment.setParent(parent);
         comment.setReference(reference);
         return comment;
     }

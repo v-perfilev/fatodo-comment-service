@@ -3,7 +3,7 @@ package contracts.commentcontroller
 import org.springframework.cloud.contract.spec.Contract
 
 Contract.make {
-    name 'create parent comment'
+    name 'add comment'
     description 'should return status 201 and CommentDTO'
     request {
         method POST()

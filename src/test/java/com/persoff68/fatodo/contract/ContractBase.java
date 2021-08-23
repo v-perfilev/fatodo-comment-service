@@ -82,11 +82,11 @@ public abstract class ContractBase {
         return threadRepository.saveAndFlush(thread);
     }
 
-    private Comment createComment(UUID id, CommentThread thread, Comment parent, UUID userId) {
+    private Comment createComment(UUID id, CommentThread thread, Comment reference, UUID userId) {
         Comment comment = TestComment.defaultBuilder()
                 .id(id)
                 .thread(thread)
-                .parent(parent)
+                .reference(reference)
                 .userId(userId)
                 .build().toParent();
         entityManager.merge(comment);

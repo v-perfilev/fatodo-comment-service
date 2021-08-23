@@ -11,15 +11,13 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 public class CommentDTO extends AbstractAuditingDTO {
     private UUID threadId;
-    private UUID parentId;
-    private ReferenceCommentDTO reference;
     private UUID userId;
     private String text;
 
     @JsonProperty("isDeleted")
     private boolean isDeleted;
 
-    private List<ReactionDTO> reactions;
+    private ReferenceCommentDTO reference;
 
-    private PageableList<CommentDTO> children;
+    private List<ReactionDTO> reactions;
 }

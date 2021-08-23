@@ -27,11 +27,6 @@ public class PermissionService {
         }
     }
 
-    public void checkParentPermission(Comment parent) {
-        CommentThread thread = parent.getThread();
-        checkThreadPermission(thread);
-    }
-
     public void checkCommentPermission(UUID userId, Comment comment) {
         CommentThread thread = comment.getThread();
         checkThreadPermission(thread);
