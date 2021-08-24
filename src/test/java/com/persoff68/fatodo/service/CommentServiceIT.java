@@ -80,9 +80,9 @@ public class CommentServiceIT {
     }
 
     @Test
-    public void testGetAllByThreadId() {
+    public void testGetAllByTargetId() {
         Pair<List<Comment>, Long> pair = commentService
-                .getAllByTargetIdPageable(this.thread.getId(), pageable);
+                .getAllByTargetIdPageable(this.thread.getTargetId(), pageable);
         List<Comment> data = pair.getFirst();
         long count = pair.getSecond();
         assertThat(data.size()).isEqualTo(3);

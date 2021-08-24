@@ -18,25 +18,25 @@ public class CommentThreadService {
     private final PermissionService permissionService;
     private final ItemServiceClient itemServiceClient;
 
-    public CommentThread getByIdOrCreate(UUID targetId) {
+    public CommentThread getByTargetIdOrCreate(UUID targetId) {
         try {
-            CommentThread thread = getById(targetId);
+            CommentThread thread = getByTargetId(targetId);
             permissionService.checkThreadPermission(thread);
             return thread;
         } catch (ModelNotFoundException e) {
-            CommentThreadType type = getTypeById(targetId);
+            CommentThreadType type = getTypeByTargetId(targetId);
             CommentThread threadToCreate = CommentThread.of(targetId, type);
             permissionService.checkThreadPermission(threadToCreate);
             return commentThreadRepository.save(threadToCreate);
         }
     }
 
-    public CommentThread getById(UUID targetId) {
-        return commentThreadRepository.findById(targetId)
+    public CommentThread getByTargetId(UUID targetId) {
+        return commentThreadRepository.findByTargetId(targetId)
                 .orElseThrow(ModelNotFoundException::new);
     }
 
-    private CommentThreadType getTypeById(UUID targetId) {
+    private CommentThreadType getTypeByTargetId(UUID targetId) {
         boolean isGroup = itemServiceClient.isGroup(targetId);
         if (isGroup) {
             return CommentThreadType.GROUP;

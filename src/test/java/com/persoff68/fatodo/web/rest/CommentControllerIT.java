@@ -91,7 +91,7 @@ public class CommentControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetAllPageable_ok_withoutParams() throws Exception {
-        String url = ENDPOINT + "/" + thread1.getId();
+        String url = ENDPOINT + "/" + thread1.getTargetId();
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
@@ -107,7 +107,7 @@ public class CommentControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetAllPageable_ok_withParams() throws Exception {
-        String url = ENDPOINT + "/" + thread1.getId() + "?offset=1&size=10";
+        String url = ENDPOINT + "/" + thread1.getTargetId() + "?offset=1&size=10";
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
@@ -123,7 +123,7 @@ public class CommentControllerIT {
     @Test
     @WithAnonymousUser
     void testGetAllPageable_unauthorized() throws Exception {
-        String url = ENDPOINT + "/" + thread1.getId();
+        String url = ENDPOINT + "/" + thread1.getTargetId();
         mvc.perform(get(url))
                 .andExpect(status().isUnauthorized());
     }
@@ -131,7 +131,7 @@ public class CommentControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testAdd_ok_existingThread() throws Exception {
-        String url = ENDPOINT + "/" + thread1.getId();
+        String url = ENDPOINT + "/" + thread1.getTargetId();
         String requestBody = "test_text";
         ResultActions resultActions = mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -146,11 +146,11 @@ public class CommentControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testAdd_ok_newThread() throws Exception {
-        UUID newThreadId = UUID.randomUUID();
-        when(itemServiceClient.isGroup(newThreadId)).thenReturn(false);
-        when(itemServiceClient.isItem(newThreadId)).thenReturn(true);
-        when(itemServiceClient.canReadItem(newThreadId)).thenReturn(true);
-        String url = ENDPOINT + "/" + newThreadId;
+        UUID newTargetId = UUID.randomUUID();
+        when(itemServiceClient.isGroup(newTargetId)).thenReturn(false);
+        when(itemServiceClient.isItem(newTargetId)).thenReturn(true);
+        when(itemServiceClient.canReadItem(newTargetId)).thenReturn(true);
+        String url = ENDPOINT + "/" + newTargetId;
         String requestBody = "test_text";
         ResultActions resultActions = mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -165,11 +165,11 @@ public class CommentControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testAdd_badRequest_wrongPermission() throws Exception {
-        UUID newThreadId = UUID.randomUUID();
-        when(itemServiceClient.isGroup(newThreadId)).thenReturn(false);
-        when(itemServiceClient.isItem(newThreadId)).thenReturn(true);
-        when(itemServiceClient.canReadItem(newThreadId)).thenReturn(false);
-        String url = ENDPOINT + "/" + newThreadId;
+        UUID newTargetId = UUID.randomUUID();
+        when(itemServiceClient.isGroup(newTargetId)).thenReturn(false);
+        when(itemServiceClient.isItem(newTargetId)).thenReturn(true);
+        when(itemServiceClient.canReadItem(newTargetId)).thenReturn(false);
+        String url = ENDPOINT + "/" + newTargetId;
         String requestBody = "test_text";
         mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -180,10 +180,10 @@ public class CommentControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testAdd_notFound() throws Exception {
-        UUID newThreadId = UUID.randomUUID();
-        when(itemServiceClient.isGroup(newThreadId)).thenReturn(false);
-        when(itemServiceClient.isItem(newThreadId)).thenReturn(false);
-        String url = ENDPOINT + "/" + newThreadId;
+        UUID newTargetId = UUID.randomUUID();
+        when(itemServiceClient.isGroup(newTargetId)).thenReturn(false);
+        when(itemServiceClient.isItem(newTargetId)).thenReturn(false);
+        String url = ENDPOINT + "/" + newTargetId;
         String requestBody = "test_text";
         mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -194,10 +194,10 @@ public class CommentControllerIT {
     @Test
     @WithAnonymousUser
     void testAdd_unauthorized() throws Exception {
-        UUID newThreadId = UUID.randomUUID();
-        when(itemServiceClient.isGroup(newThreadId)).thenReturn(false);
-        when(itemServiceClient.isItem(newThreadId)).thenReturn(false);
-        String url = ENDPOINT + "/" + newThreadId;
+        UUID newTargetId = UUID.randomUUID();
+        when(itemServiceClient.isGroup(newTargetId)).thenReturn(false);
+        when(itemServiceClient.isItem(newTargetId)).thenReturn(false);
+        String url = ENDPOINT + "/" + newTargetId;
         String requestBody = "test_text";
         mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)

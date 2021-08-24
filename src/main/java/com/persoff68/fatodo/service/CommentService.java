@@ -25,15 +25,15 @@ public class CommentService {
     private final WsService wsService;
 
     public Pair<List<Comment>, Long> getAllByTargetIdPageable(UUID targetId, Pageable pageable) {
-        CommentThread thread = threadService.getById(targetId);
+        CommentThread thread = threadService.getByTargetId(targetId);
         permissionService.checkThreadPermission(thread);
-        Page<Comment> commentPage = commentRepository.findAllByThreadId(targetId, pageable);
+        Page<Comment> commentPage = commentRepository.findAllByThreadId(thread.getId(), pageable);
         return Pair.of(commentPage.getContent(), commentPage.getTotalElements());
     }
 
     @Transactional
     public Comment add(UUID userId, UUID targetId, String text) {
-        CommentThread thread = threadService.getByIdOrCreate(targetId);
+        CommentThread thread = threadService.getByTargetIdOrCreate(targetId);
         Comment comment = Comment.of(userId, thread, text);
         comment = commentRepository.save(comment);
 
