@@ -3,6 +3,7 @@ package com.persoff68.fatodo.service;
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.repository.CommentRepository;
+import com.persoff68.fatodo.service.exception.ModelInvalidException;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.ws.WsService;
 import lombok.RequiredArgsConstructor;
@@ -32,26 +33,10 @@ public class CommentService {
     }
 
     @Transactional
-    public Comment add(UUID userId, UUID targetId, String text) {
-        CommentThread thread = threadService.getByTargetIdOrCreate(targetId);
-        Comment comment = Comment.of(userId, thread, text);
-        comment = commentRepository.save(comment);
-
-        // WS
-        wsService.sendCommentNewEvent(comment);
-
-        return comment;
-    }
-
-    @Transactional
-    public Comment addWithReference(UUID userId, UUID referenceId, String text) {
-        Comment reference = commentRepository.findById(referenceId)
-                .orElseThrow(ModelNotFoundException::new);
-        CommentThread thread = reference.getThread();
-
-        permissionService.checkThreadPermission(thread);
-
-        Comment comment = Comment.of(userId, thread, reference, text);
+    public Comment add(UUID userId, UUID targetId, String text, UUID referenceId) {
+        Comment comment = referenceId == null
+                ? addWithoutReference(userId, targetId, text)
+                : addWithReference(userId, targetId, text, referenceId);
         comment = commentRepository.save(comment);
 
         // WS
@@ -87,6 +72,26 @@ public class CommentService {
 
         // WS
         wsService.sendCommentUpdateEvent(comment);
+    }
+
+    private Comment addWithReference(UUID userId, UUID targetId, String text, UUID referenceId) {
+        Comment comment;
+        Comment reference = commentRepository.findById(referenceId)
+                .orElseThrow(ModelNotFoundException::new);
+        CommentThread thread = reference.getThread();
+        if (!thread.getTargetId().equals(targetId)) {
+            throw new ModelInvalidException();
+        }
+        permissionService.checkThreadPermission(thread);
+        comment = Comment.of(userId, thread, reference, text);
+        return comment;
+    }
+
+    private Comment addWithoutReference(UUID userId, UUID targetId, String text) {
+        Comment comment;
+        CommentThread thread = threadService.getByTargetIdOrCreate(targetId);
+        comment = Comment.of(userId, thread, text);
+        return comment;
     }
 
 }

@@ -8,6 +8,7 @@ import com.persoff68.fatodo.repository.OffsetPageRequest;
 import com.persoff68.fatodo.security.exception.UnauthorizedException;
 import com.persoff68.fatodo.security.util.SecurityUtils;
 import com.persoff68.fatodo.service.CommentService;
+import com.persoff68.fatodo.web.rest.vm.CommentVM;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -60,27 +62,18 @@ public class CommentController {
 
     @PostMapping("/{targetId}")
     public ResponseEntity<CommentDTO> add(@PathVariable UUID targetId,
-                                          @RequestBody String text) {
+                                          @Valid @RequestBody CommentVM commentVM) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
-        Comment comment = commentService.add(userId, targetId, text);
-        CommentDTO dto = commentMapper.pojoToDTO(comment);
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
-    }
-
-    @PostMapping("/{referenceId}/reference")
-    public ResponseEntity<CommentDTO> addWithReference(@PathVariable UUID referenceId,
-                                                       @RequestBody String text) {
-        UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
-        Comment comment = commentService.addWithReference(userId, referenceId, text);
+        Comment comment = commentService.add(userId, targetId, commentVM.getText(), commentVM.getReferenceId());
         CommentDTO dto = commentMapper.pojoToDTO(comment);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
     @PutMapping("/{commentId}")
     public ResponseEntity<CommentDTO> edit(@PathVariable UUID commentId,
-                                           @RequestBody String text) {
+                                           @Valid @RequestBody CommentVM commentVM) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
-        Comment comment = commentService.edit(userId, commentId, text);
+        Comment comment = commentService.edit(userId, commentId, commentVM.getText());
         CommentDTO dto = commentMapper.pojoToDTO(comment);
         return ResponseEntity.ok(dto);
     }

@@ -65,9 +65,9 @@ public class CommentServiceIT {
 
         doNothing().when(wsServiceClient).sendCommentNewEvent(any());
 
-        this.comment1 = commentService.add(USER_1_ID, TARGET_ID, "test");
-        this.comment2 = commentService.addWithReference(USER_1_ID, this.comment1.getId(), "test");
-        this.comment3 = commentService.addWithReference(USER_2_ID, this.comment1.getId(), "test");
+        this.comment1 = commentService.add(USER_1_ID, TARGET_ID, "test", null);
+        this.comment2 = commentService.add(USER_1_ID, TARGET_ID, "test", this.comment1.getId());
+        this.comment3 = commentService.add(USER_2_ID, TARGET_ID, "test", this.comment1.getId());
         this.thread = this.comment1.getThread();
     }
 

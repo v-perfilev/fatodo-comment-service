@@ -20,7 +20,9 @@ Contract.make {
         }
         body($(
                 consumer(regex(".+")),
-                producer("test")
+                producer([
+                        "text": "new_test"
+                ])
         ))
     }
     response {
@@ -30,7 +32,7 @@ Contract.make {
         }
         body([
                 "id"  : anyUuid(),
-                "text": "test"
+                "text": "new_test"
         ])
     }
 }

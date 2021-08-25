@@ -6,6 +6,7 @@ import com.persoff68.fatodo.FatodoCommentServiceApplication;
 import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.builder.TestComment;
 import com.persoff68.fatodo.builder.TestCommentThread;
+import com.persoff68.fatodo.builder.TestCommentVM;
 import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Comment;
@@ -15,6 +16,7 @@ import com.persoff68.fatodo.model.dto.CommentDTO;
 import com.persoff68.fatodo.model.dto.PageableList;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
+import com.persoff68.fatodo.web.rest.vm.CommentVM;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,14 +134,15 @@ public class CommentControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testAdd_ok_existingThread() throws Exception {
         String url = ENDPOINT + "/" + thread1.getTargetId();
-        String requestBody = "test_text";
+        CommentVM vm = TestCommentVM.defaultBuilder().build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
         ResultActions resultActions = mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isCreated());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CommentDTO dto = objectMapper.readValue(resultString, CommentDTO.class);
-        assertThat(dto.getText()).isEqualTo(requestBody);
+        assertThat(dto.getText()).isEqualTo(vm.getText());
         assertThat(dto.getUserId().toString()).isEqualTo(USER_ID_1);
     }
 
@@ -151,15 +154,45 @@ public class CommentControllerIT {
         when(itemServiceClient.isItem(newTargetId)).thenReturn(true);
         when(itemServiceClient.canReadItem(newTargetId)).thenReturn(true);
         String url = ENDPOINT + "/" + newTargetId;
-        String requestBody = "test_text";
+        CommentVM vm = TestCommentVM.defaultBuilder().build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
         ResultActions resultActions = mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isCreated());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CommentDTO dto = objectMapper.readValue(resultString, CommentDTO.class);
-        assertThat(dto.getText()).isEqualTo(requestBody);
+        assertThat(dto.getText()).isEqualTo(vm.getText());
         assertThat(dto.getUserId().toString()).isEqualTo(USER_ID_1);
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testAdd_ok_withReference() throws Exception {
+        String url = ENDPOINT + "/" + thread1.getTargetId();
+        CommentVM vm = TestCommentVM.defaultBuilder().referenceId(comment3.getId()).build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
+        ResultActions resultActions = mvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isCreated());
+        String resultString = resultActions.andReturn().getResponse().getContentAsString();
+        CommentDTO dto = objectMapper.readValue(resultString, CommentDTO.class);
+        assertThat(dto.getText()).isEqualTo(vm.getText());
+        assertThat(dto.getReference().getId()).isEqualTo(vm.getReferenceId());
+        assertThat(dto.getUserId().toString()).isEqualTo(USER_ID_1);
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testAdd_withReference_badRequest_invalidModel() throws Exception {
+        String url = ENDPOINT + "/" + thread1.getTargetId();
+        CommentVM vm = TestCommentVM.defaultBuilder().referenceId(comment4.getId()).build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
+        mvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -170,7 +203,8 @@ public class CommentControllerIT {
         when(itemServiceClient.isItem(newTargetId)).thenReturn(true);
         when(itemServiceClient.canReadItem(newTargetId)).thenReturn(false);
         String url = ENDPOINT + "/" + newTargetId;
-        String requestBody = "test_text";
+        CommentVM vm = TestCommentVM.defaultBuilder().build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
@@ -184,7 +218,8 @@ public class CommentControllerIT {
         when(itemServiceClient.isGroup(newTargetId)).thenReturn(false);
         when(itemServiceClient.isItem(newTargetId)).thenReturn(false);
         String url = ENDPOINT + "/" + newTargetId;
-        String requestBody = "test_text";
+        CommentVM vm = TestCommentVM.defaultBuilder().build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
@@ -198,57 +233,8 @@ public class CommentControllerIT {
         when(itemServiceClient.isGroup(newTargetId)).thenReturn(false);
         when(itemServiceClient.isItem(newTargetId)).thenReturn(false);
         String url = ENDPOINT + "/" + newTargetId;
-        String requestBody = "test_text";
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @WithCustomSecurityContext(id = USER_ID_1)
-    void testAddWithReference_ok() throws Exception {
-        String url = ENDPOINT + "/" + comment1.getId() + "/reference";
-        String requestBody = "test_text";
-        ResultActions resultActions = mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isCreated());
-        String resultString = resultActions.andReturn().getResponse().getContentAsString();
-        CommentDTO dto = objectMapper.readValue(resultString, CommentDTO.class);
-        assertThat(dto.getText()).isEqualTo(requestBody);
-        assertThat(dto.getReference().getId()).isEqualTo(comment1.getId());
-        assertThat(dto.getUserId().toString()).isEqualTo(USER_ID_1);
-    }
-
-    @Test
-    @WithCustomSecurityContext(id = USER_ID_1)
-    void testAddWithReference_badRequest_wrongPermission() throws Exception {
-        when(itemServiceClient.canReadGroup(any())).thenReturn(false);
-        String url = ENDPOINT + "/" + comment1.getId() + "/reference";
-        String requestBody = "test_text";
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithCustomSecurityContext(id = USER_ID_1)
-    void testAddWithReference_notFound() throws Exception {
-        String url = ENDPOINT + "/" + UUID.randomUUID() + "/reference";
-        String requestBody = "test_text";
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @WithAnonymousUser
-    void testAddWithReference_unauthorized() throws Exception {
-        String url = ENDPOINT + "/" + thread1.getId() + "/" + comment1.getId();
-        String requestBody = "test_text";
+        CommentVM vm = TestCommentVM.defaultBuilder().build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
@@ -259,21 +245,23 @@ public class CommentControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testEdit_ok() throws Exception {
         String url = ENDPOINT + "/" + comment1.getId();
-        String requestBody = "new_test_text";
+        CommentVM vm = TestCommentVM.defaultBuilder().text("new").build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
         ResultActions resultActions = mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CommentDTO dto = objectMapper.readValue(resultString, CommentDTO.class);
-        assertThat(dto.getText()).isEqualTo(requestBody);
+        assertThat(dto.getText()).isEqualTo(vm.getText());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testEdit_badRequest_notOwnComment() throws Exception {
         String url = ENDPOINT + "/" + comment3.getId();
-        String requestBody = "new_test_text";
+        CommentVM vm = TestCommentVM.defaultBuilder().text("new").build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
@@ -285,7 +273,8 @@ public class CommentControllerIT {
     void testEdit_badRequest_wrongPermission() throws Exception {
         when(itemServiceClient.canReadGroup(any())).thenReturn(false);
         String url = ENDPOINT + "/" + comment3.getId();
-        String requestBody = "new_test_text";
+        CommentVM vm = TestCommentVM.defaultBuilder().text("new").build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
@@ -296,7 +285,8 @@ public class CommentControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testEdit_notFound() throws Exception {
         String url = ENDPOINT + "/" + UUID.randomUUID();
-        String requestBody = "new_test_text";
+        CommentVM vm = TestCommentVM.defaultBuilder().text("new").build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
@@ -307,7 +297,8 @@ public class CommentControllerIT {
     @WithAnonymousUser
     void testEdit_unauthorized() throws Exception {
         String url = ENDPOINT + "/" + comment3.getId();
-        String requestBody = "new_test_text";
+        CommentVM vm = TestCommentVM.defaultBuilder().text("new").build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
