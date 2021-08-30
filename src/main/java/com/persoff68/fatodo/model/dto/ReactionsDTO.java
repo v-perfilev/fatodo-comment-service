@@ -10,6 +10,7 @@ import java.util.UUID;
 public class ReactionsDTO implements Serializable {
 
     private UUID threadId;
+    private UUID targetId;
     private UUID commentId;
 
     private List<ReactionDTO> reactions;
