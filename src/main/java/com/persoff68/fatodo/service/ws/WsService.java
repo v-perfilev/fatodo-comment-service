@@ -10,6 +10,7 @@ import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.WsEventDTO;
 import com.persoff68.fatodo.model.mapper.CommentMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Async
 public class WsService {
 
     private final WsServiceClient wsServiceClient;
