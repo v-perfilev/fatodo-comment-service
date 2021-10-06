@@ -50,9 +50,9 @@ public class WsService {
         CommentThread thread = comment.getThread();
         CommentThreadType type = thread.getType();
         if (type.equals(CommentThreadType.GROUP)) {
-            return itemServiceClient.getGroupUserIdsById(thread.getTargetId());
+            return itemServiceClient.getUserIdsByGroupId(thread.getTargetId());
         } else {
-            return itemServiceClient.getItemUserIdsById(thread.getTargetId());
+            return itemServiceClient.getUserIdsByItemId(thread.getTargetId());
         }
     }
 

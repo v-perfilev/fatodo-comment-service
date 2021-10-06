@@ -22,9 +22,9 @@ public interface ItemServiceClient {
     @GetMapping(value = "/api/check/is-item/{itemId}")
     boolean isItem(@PathVariable UUID itemId);
 
-    @GetMapping(value = "/api/groups/{groupId}/user-ids")
-    List<UUID> getGroupUserIdsById(@PathVariable UUID groupId);
+    @GetMapping(value = "/api/members/group/{groupId}/user-ids")
+    List<UUID> getUserIdsByGroupId(@PathVariable UUID groupId);
 
-    @GetMapping(value = "/api/items/{itemId}/user-ids")
-    List<UUID> getItemUserIdsById(@PathVariable UUID itemId);
+    @GetMapping(value = "/api/members/item/{itemId}/user-ids")
+    List<UUID> getUserIdsByItemId(@PathVariable UUID itemId);
 }

@@ -60,9 +60,9 @@ public class ItemServiceClientWrapper implements ItemServiceClient {
     }
 
     @Override
-    public List<UUID> getGroupUserIdsById(UUID groupId) {
+    public List<UUID> getUserIdsByGroupId(UUID groupId) {
         try {
-            return itemServiceClient.getGroupUserIdsById(groupId);
+            return itemServiceClient.getUserIdsByGroupId(groupId);
         } catch (FeignException.NotFound e) {
             throw new ModelNotFoundException();
         } catch (Exception e) {
@@ -71,9 +71,9 @@ public class ItemServiceClientWrapper implements ItemServiceClient {
     }
 
     @Override
-    public List<UUID> getItemUserIdsById(UUID itemId) {
+    public List<UUID> getUserIdsByItemId(UUID itemId) {
         try {
-            return itemServiceClient.getItemUserIdsById(itemId);
+            return itemServiceClient.getUserIdsByItemId(itemId);
         } catch (FeignException.NotFound e) {
             throw new ModelNotFoundException();
         } catch (Exception e) {

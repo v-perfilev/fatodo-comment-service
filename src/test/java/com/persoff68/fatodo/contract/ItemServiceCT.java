@@ -46,13 +46,13 @@ public class ItemServiceCT {
 
     @Test
     void testGetGroupUserIds() {
-        List<UUID> userIdList = itemServiceClient.getGroupUserIdsById(UUID.randomUUID());
+        List<UUID> userIdList = itemServiceClient.getUserIdsByGroupId(UUID.randomUUID());
         assertThat(userIdList).isNotEmpty();
     }
 
     @Test
     void testGetItemUserIds() {
-        List<UUID> userIdList = itemServiceClient.getItemUserIdsById(UUID.randomUUID());
+        List<UUID> userIdList = itemServiceClient.getUserIdsByItemId(UUID.randomUUID());
         assertThat(userIdList).isNotEmpty();
     }
 
