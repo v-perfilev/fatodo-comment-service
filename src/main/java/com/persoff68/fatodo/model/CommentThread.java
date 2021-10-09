@@ -35,7 +35,7 @@ public class CommentThread extends AbstractModel {
     @Enumerated(EnumType.STRING)
     private CommentThreadType type;
 
-    @OneToMany(mappedBy = "thread", cascade = {CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "thread", cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
     public static CommentThread of(UUID targetId, CommentThreadType type) {

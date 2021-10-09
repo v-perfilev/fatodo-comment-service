@@ -10,7 +10,7 @@
 
             <column name="comment_id" type="binary(16)">
                 <constraints primaryKey="true" foreignKeyName="fk_reaction_comment" references="ftd_comment(id)"
-                             nullable="false"/>
+                             deleteCascade="true" nullable="false"/>
             </column>
 
             <column name="user_id" type="binary(16)">
