@@ -21,7 +21,7 @@ public interface ItemServiceClient {
     @GetMapping(value = "/api/permissions/item/read/{itemId}")
     boolean canReadItem(@PathVariable UUID itemId);
 
-    @GetMapping(value = "/api/permissions/items/admin")
+    @PostMapping(value = "/api/permissions/items/admin")
     boolean canAdminItems(@RequestBody List<UUID> itemIdList);
 
     @GetMapping(value = "/api/check/is-group/{groupId}")
