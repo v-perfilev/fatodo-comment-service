@@ -37,6 +37,7 @@ public class PermissionService {
         switch (type) {
             case GROUP -> checkGroupsAdminPermission(threadCollection);
             case ITEM -> checkItemsAdminPermission(threadCollection);
+            default -> throw new PermissionException();
         }
     }
 
@@ -45,6 +46,7 @@ public class PermissionService {
         switch (type) {
             case GROUP -> checkGroupReadPermission(thread);
             case ITEM -> checkItemReadPermission(thread);
+            default -> throw new PermissionException();
         }
     }
 
