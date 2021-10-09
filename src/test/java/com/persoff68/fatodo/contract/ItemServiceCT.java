@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
 import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,8 +28,22 @@ public class ItemServiceCT {
     }
 
     @Test
+    void testCanAdminGroups() {
+        List<UUID> groupIdList = Collections.singletonList(UUID.randomUUID());
+        boolean canRead = itemServiceClient.canAdminGroups(groupIdList);
+        assertThat(canRead).isTrue();
+    }
+
+    @Test
     void testCanReadItem() {
         boolean canRead = itemServiceClient.canReadItem(UUID.randomUUID());
+        assertThat(canRead).isTrue();
+    }
+
+    @Test
+    void testCanAdminItems() {
+        List<UUID> itemIdList = Collections.singletonList(UUID.randomUUID());
+        boolean canRead = itemServiceClient.canAdminItems(itemIdList);
         assertThat(canRead).isTrue();
     }
 

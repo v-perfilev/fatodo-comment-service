@@ -3,6 +3,8 @@ package com.persoff68.fatodo.client;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.UUID;
@@ -10,11 +12,17 @@ import java.util.UUID;
 @FeignClient(name = "item-service", primary = false)
 public interface ItemServiceClient {
 
-    @GetMapping(value = "/api/permissions/group/{groupId}")
+    @GetMapping(value = "/api/permissions/group/read/{groupId}")
     boolean canReadGroup(@PathVariable UUID groupId);
 
-    @GetMapping(value = "/api/permissions/item/{itemId}")
+    @PostMapping(value = "/api/permissions/groups/admin")
+    boolean canAdminGroups(@RequestBody List<UUID> groupIdList);
+
+    @GetMapping(value = "/api/permissions/item/read/{itemId}")
     boolean canReadItem(@PathVariable UUID itemId);
+
+    @GetMapping(value = "/api/permissions/items/admin")
+    boolean canAdminItems(@RequestBody List<UUID> itemIdList);
 
     @GetMapping(value = "/api/check/is-group/{groupId}")
     boolean isGroup(@PathVariable UUID groupId);
