@@ -23,22 +23,14 @@ public class PermissionService {
 
     private final ItemServiceClient itemServiceClient;
 
-    public void checkThreadsPermission(List<CommentThread> threadList) {
-        Multimap<CommentThreadType, CommentThread> threadMultimap = threadList.stream()
+    public void checkThreadsAdminPermission(Collection<CommentThread> threadCollection) {
+        Multimap<CommentThreadType, CommentThread> threadMultimap = threadCollection.stream()
                 .collect(Multimaps.toMultimap(
                         CommentThread::getType,
                         Function.identity(),
                         HashMultimap::create
                 ));
         threadMultimap.keySet().forEach(key -> checkThreadsAdminPermission(key, threadMultimap.get(key)));
-    }
-
-    public void checkThreadsAdminPermission(CommentThreadType type, Collection<CommentThread> threadCollection) {
-        switch (type) {
-            case GROUP -> checkGroupsAdminPermission(threadCollection);
-            case ITEM -> checkItemsAdminPermission(threadCollection);
-            default -> throw new PermissionException();
-        }
     }
 
     public void checkThreadReadPermission(CommentThread thread) {
@@ -61,6 +53,15 @@ public class PermissionService {
         checkThreadReadPermission(thread);
         checkNotOwnComment(userId, comment);
     }
+
+    private void checkThreadsAdminPermission(CommentThreadType type, Collection<CommentThread> threadCollection) {
+        switch (type) {
+            case GROUP -> checkGroupsAdminPermission(threadCollection);
+            case ITEM -> checkItemsAdminPermission(threadCollection);
+            default -> throw new PermissionException();
+        }
+    }
+
 
     private void checkOwnComment(UUID userId, Comment comment) {
         if (!userId.equals(comment.getUserId())) {

@@ -16,7 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ItemServiceClientWrapper implements ItemServiceClient {
 
-    @Qualifier("groupServiceClient")
+    @Qualifier("itemServiceClient")
     private final ItemServiceClient itemServiceClient;
 
     @Override

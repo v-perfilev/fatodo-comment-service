@@ -6,7 +6,6 @@ import com.persoff68.fatodo.model.constant.CommentThreadType;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -44,7 +43,7 @@ public class CommentThreadService {
     public void deleteByTargetIds(List<UUID> targetIdList) {
         List<CommentThread> threadList = commentThreadRepository.findAllByThreadIds(targetIdList);
         if (!threadList.isEmpty()) {
-            permissionService.checkThreadsPermission(threadList);
+            permissionService.checkThreadsAdminPermission(threadList);
             List<UUID> idList = threadList.stream()
                     .map(CommentThread::getId)
                     .collect(Collectors.toList());
