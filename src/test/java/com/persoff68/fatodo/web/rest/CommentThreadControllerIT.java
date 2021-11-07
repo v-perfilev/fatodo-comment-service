@@ -97,7 +97,7 @@ public class CommentThreadControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID)
-    void testDeleteAllByTargetIds_wrongPermission() throws Exception {
+    void testDeleteAllByTargetIds_forbidden() throws Exception {
         when(itemServiceClient.canAdminGroups(anyList())).thenReturn(false);
         String url = ENDPOINT + "/delete";
         List<UUID> threadIdList = Collections.singletonList(thread1.getTargetId());
@@ -105,7 +105,7 @@ public class CommentThreadControllerIT {
         mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
         List<CommentThread> threadList = threadRepository.findAll();
         assertThat(threadList).isNotEmpty();
     }

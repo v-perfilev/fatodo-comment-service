@@ -197,7 +197,7 @@ public class CommentControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testAdd_badRequest_wrongPermission() throws Exception {
+    void testAdd_forbidden_wrongPermission() throws Exception {
         UUID newTargetId = UUID.randomUUID();
         when(itemServiceClient.isGroup(newTargetId)).thenReturn(false);
         when(itemServiceClient.isItem(newTargetId)).thenReturn(true);
@@ -208,7 +208,7 @@ public class CommentControllerIT {
         mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -258,19 +258,19 @@ public class CommentControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testEdit_badRequest_notOwnComment() throws Exception {
+    void testEdit_forbidden_notOwnComment() throws Exception {
         String url = ENDPOINT + "/" + comment3.getId();
         CommentVM vm = TestCommentVM.defaultBuilder().text("new").build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testEdit_badRequest_wrongPermission() throws Exception {
+    void testEdit_forbidden_wrongPermission() throws Exception {
         when(itemServiceClient.canReadGroup(any())).thenReturn(false);
         String url = ENDPOINT + "/" + comment3.getId();
         CommentVM vm = TestCommentVM.defaultBuilder().text("new").build().toParent();
@@ -278,7 +278,7 @@ public class CommentControllerIT {
         mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -315,19 +315,19 @@ public class CommentControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testDelete_badRequest_notOwnComment() throws Exception {
+    void testDelete_forbidden_notOwnComment() throws Exception {
         String url = ENDPOINT + "/" + comment3.getId();
         mvc.perform(delete(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testDelete_badRequest_wrongPermission() throws Exception {
+    void testDelete_forbidden_wrongPermission() throws Exception {
         when(itemServiceClient.canReadGroup(any())).thenReturn(false);
         String url = ENDPOINT + "/" + comment3.getId();
         mvc.perform(delete(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
