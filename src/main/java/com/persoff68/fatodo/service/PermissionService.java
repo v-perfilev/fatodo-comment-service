@@ -30,7 +30,7 @@ public class PermissionService {
                         Function.identity(),
                         HashMultimap::create
                 ));
-        threadMultimap.keySet().forEach(key -> checkThreadsAdminPermission(key, threadMultimap.get(key)));
+        threadMultimap.keySet().forEach(key -> checkSameTypeThreadsAdminPermission(key, threadMultimap.get(key)));
     }
 
     public void checkThreadReadPermission(CommentThread thread) {
@@ -54,7 +54,8 @@ public class PermissionService {
         checkNotOwnComment(userId, comment);
     }
 
-    private void checkThreadsAdminPermission(CommentThreadType type, Collection<CommentThread> threadCollection) {
+    private void checkSameTypeThreadsAdminPermission(CommentThreadType type,
+                                                     Collection<CommentThread> threadCollection) {
         switch (type) {
             case GROUP -> checkGroupsAdminPermission(threadCollection);
             case ITEM -> checkItemsAdminPermission(threadCollection);
