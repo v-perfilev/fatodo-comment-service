@@ -47,12 +47,7 @@ public class CommentThreadService {
             List<UUID> idList = threadList.stream()
                     .map(CommentThread::getId)
                     .collect(Collectors.toList());
-            try {
-                commentThreadRepository.deleteAllByIds(idList);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw e;
-            }
+            commentThreadRepository.deleteAllByIds(idList);
         }
     }
 
