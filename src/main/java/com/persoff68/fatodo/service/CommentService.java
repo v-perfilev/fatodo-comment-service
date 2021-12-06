@@ -2,6 +2,7 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
+import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.service.exception.ModelInvalidException;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
@@ -9,11 +10,9 @@ import com.persoff68.fatodo.service.ws.WsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -25,11 +24,11 @@ public class CommentService {
     private final PermissionService permissionService;
     private final WsService wsService;
 
-    public Pair<List<Comment>, Long> getAllByTargetIdPageable(UUID targetId, Pageable pageable) {
+    public PageableList<Comment> getAllByTargetIdPageable(UUID targetId, Pageable pageable) {
         CommentThread thread = threadService.getByTargetId(targetId);
         permissionService.checkThreadReadPermission(thread);
         Page<Comment> commentPage = commentRepository.findAllByThreadId(thread.getId(), pageable);
-        return Pair.of(commentPage.getContent(), commentPage.getTotalElements());
+        return PageableList.of(commentPage.getContent(), commentPage.getTotalElements());
     }
 
     @Transactional

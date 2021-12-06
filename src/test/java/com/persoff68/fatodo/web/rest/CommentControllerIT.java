@@ -13,7 +13,7 @@ import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.constant.CommentThreadType;
 import com.persoff68.fatodo.model.dto.CommentDTO;
-import com.persoff68.fatodo.model.dto.PageableList;
+import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
 import com.persoff68.fatodo.web.rest.vm.CommentVM;

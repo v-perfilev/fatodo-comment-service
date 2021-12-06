@@ -24,10 +24,11 @@ Contract.make {
             contentType applicationJson()
         }
         body([
-                [
+                "data" : [
                         "id"  : "6796a82a-93c6-4fdf-bf5d-2da77ce2c338",
                         "text": anyNonEmptyString()
-                ]
+                ],
+                "count": 2
         ])
     }
 }

@@ -1,8 +1,8 @@
 package com.persoff68.fatodo.web.rest;
 
 import com.persoff68.fatodo.model.Comment;
+import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.model.dto.CommentDTO;
-import com.persoff68.fatodo.model.dto.PageableList;
 import com.persoff68.fatodo.model.mapper.CommentMapper;
 import com.persoff68.fatodo.repository.OffsetPageRequest;
 import com.persoff68.fatodo.security.exception.UnauthorizedException;
@@ -11,7 +11,6 @@ import com.persoff68.fatodo.service.CommentService;
 import com.persoff68.fatodo.web.rest.vm.CommentVM;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,11 +51,11 @@ public class CommentController {
         offset = Optional.ofNullable(offset).orElse(0);
         size = Optional.ofNullable(size).orElse(DEFAULT_SIZE);
         Pageable pageRequest = OffsetPageRequest.of(offset, size);
-        Pair<List<Comment>, Long> pair = commentService.getAllByTargetIdPageable(targetId, pageRequest);
-        List<CommentDTO> dtoList = pair.getFirst().stream()
+        PageableList<Comment> pageableList = commentService.getAllByTargetIdPageable(targetId, pageRequest);
+        List<CommentDTO> dtoList = pageableList.getData().stream()
                 .map(commentMapper::pojoToDTO)
                 .collect(Collectors.toList());
-        PageableList<CommentDTO> dtoPageableList = PageableList.of(dtoList, pair.getSecond());
+        PageableList<CommentDTO> dtoPageableList = PageableList.of(dtoList, pageableList.getCount());
         return ResponseEntity.ok(dtoPageableList);
     }
 
