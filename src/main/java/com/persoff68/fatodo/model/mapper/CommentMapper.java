@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
@@ -70,7 +69,7 @@ public abstract class CommentMapper {
         return comment.getReactions() != null
                 ? comment.getReactions().stream()
                 .map(reactionMapper::pojoToDTO)
-                .collect(Collectors.toList())
+                .toList()
                 : Collections.emptyList();
     }
 

@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Data
 @AllArgsConstructor
-public class WsEventDTO<T> implements Serializable {
+public class WsEventDTO<T extends Serializable> implements Serializable {
     protected static final long serialVersionUID = AppConstants.SERIAL_VERSION_UID;
 
     private final List<UUID> userIds;

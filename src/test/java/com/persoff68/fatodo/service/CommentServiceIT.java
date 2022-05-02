@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = FatodoCommentServiceApplication.class)
 @AutoConfigureMockMvc
-public class CommentServiceIT {
+class CommentServiceIT {
     private static final Pageable pageable = PageRequest.of(0, 100);
     private static final UUID USER_1_ID = UUID.randomUUID();
     private static final UUID USER_2_ID = UUID.randomUUID();
@@ -55,7 +55,7 @@ public class CommentServiceIT {
     Comment comment3;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         threadRepository.deleteAll();
         commentRepository.deleteAll();
 
@@ -72,15 +72,15 @@ public class CommentServiceIT {
     }
 
     @Test
-    public void testAllCommentsAreInDb() {
+    void testAllCommentsAreInDb() {
         List<Comment> commentList = commentRepository.findAll();
         Comment comment = commentRepository.findById(this.comment1.getId()).orElse(null);
-        assertThat(commentList.size()).isEqualTo(3);
+        assertThat(commentList).hasSize(3);
         assertThat(comment).isNotNull();
     }
 
     @Test
-    public void testGetAllByTargetId() {
+    void testGetAllByTargetId() {
         PageableList<Comment> pageableList = commentService
                 .getAllByTargetIdPageable(this.thread.getTargetId(), pageable);
         assertThat(pageableList.getData()).hasSize(3);

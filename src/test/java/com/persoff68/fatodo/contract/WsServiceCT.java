@@ -15,12 +15,12 @@ import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties
 
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @SpringBootTest
 @AutoConfigureStubRunner(ids = {"com.persoff68.fatodo:wsservice:+:stubs"},
         stubsMode = StubRunnerProperties.StubsMode.REMOTE)
-public class WsServiceCT {
+class WsServiceCT {
 
     @Autowired
     WsServiceClient wsServiceClient;
@@ -29,16 +29,14 @@ public class WsServiceCT {
     void testSendCommentNewEvent() {
         CommentDTO commentDTO = TestCommentDTO.defaultBuilder().id(UUID.randomUUID()).build().toParent();
         WsEventDTO<CommentDTO> dto = TestWsEventDTO.<CommentDTO>defaultBuilder().content(commentDTO).build().toParent();
-        wsServiceClient.sendCommentNewEvent(dto);
-        assertThat(true).isTrue();
+        assertDoesNotThrow(() -> wsServiceClient.sendCommentNewEvent(dto));
     }
 
     @Test
     void testSendCommentUpdateEvent() {
         CommentDTO commentDTO = TestCommentDTO.defaultBuilder().id(UUID.randomUUID()).build().toParent();
         WsEventDTO<CommentDTO> dto = TestWsEventDTO.<CommentDTO>defaultBuilder().content(commentDTO).build().toParent();
-        wsServiceClient.sendCommentUpdateEvent(dto);
-        assertThat(true).isTrue();
+        assertDoesNotThrow(() -> wsServiceClient.sendCommentUpdateEvent(dto));
     }
 
     @Test
@@ -46,8 +44,7 @@ public class WsServiceCT {
         ReactionsDTO reactionsDTO = TestReactionsDTO.defaultBuilder().build().toParent();
         WsEventDTO<ReactionsDTO> dto = TestWsEventDTO.<ReactionsDTO>defaultBuilder()
                 .content(reactionsDTO).build().toParent();
-        wsServiceClient.sendReactionsEvent(dto);
-        assertThat(true).isTrue();
+        assertDoesNotThrow(() -> wsServiceClient.sendReactionsEvent(dto));
     }
 
 }

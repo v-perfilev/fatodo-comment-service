@@ -11,9 +11,9 @@ import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
+import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.model.constant.CommentThreadType;
 import com.persoff68.fatodo.model.dto.CommentDTO;
-import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
 import com.persoff68.fatodo.web.rest.vm.CommentVM;
@@ -43,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = FatodoCommentServiceApplication.class)
 @AutoConfigureMockMvc
-public class CommentControllerIT {
+class CommentControllerIT {
     private static final String ENDPOINT = "/api/comments";
 
     private static final String USER_ID_1 = "3c300277-b5ea-48d1-80db-ead620cf5846";
@@ -72,7 +72,7 @@ public class CommentControllerIT {
     Comment comment4;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         threadRepository.deleteAll();
         commentRepository.deleteAll();
 
@@ -102,7 +102,7 @@ public class CommentControllerIT {
         PageableList<CommentDTO> resultPageableList = objectMapper.readValue(resultString, javaType);
         List<CommentDTO> dtoList = resultPageableList.getData();
         long count = resultPageableList.getCount();
-        assertThat(dtoList.size()).isEqualTo(3);
+        assertThat(dtoList).hasSize(3);
         assertThat(count).isEqualTo(3);
     }
 
@@ -118,7 +118,7 @@ public class CommentControllerIT {
         PageableList<CommentDTO> resultPageableList = objectMapper.readValue(resultString, javaType);
         List<CommentDTO> dtoList = resultPageableList.getData();
         long count = resultPageableList.getCount();
-        assertThat(dtoList.size()).isEqualTo(2);
+        assertThat(dtoList).hasSize(2);
         assertThat(count).isEqualTo(3);
     }
 
@@ -143,7 +143,7 @@ public class CommentControllerIT {
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CommentDTO dto = objectMapper.readValue(resultString, CommentDTO.class);
         assertThat(dto.getText()).isEqualTo(vm.getText());
-        assertThat(dto.getUserId().toString()).isEqualTo(USER_ID_1);
+        assertThat(dto.getUserId()).hasToString(USER_ID_1);
     }
 
     @Test
@@ -163,7 +163,7 @@ public class CommentControllerIT {
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CommentDTO dto = objectMapper.readValue(resultString, CommentDTO.class);
         assertThat(dto.getText()).isEqualTo(vm.getText());
-        assertThat(dto.getUserId().toString()).isEqualTo(USER_ID_1);
+        assertThat(dto.getUserId()).hasToString(USER_ID_1);
     }
 
     @Test
@@ -180,7 +180,7 @@ public class CommentControllerIT {
         CommentDTO dto = objectMapper.readValue(resultString, CommentDTO.class);
         assertThat(dto.getText()).isEqualTo(vm.getText());
         assertThat(dto.getReference().getId()).isEqualTo(vm.getReferenceId());
-        assertThat(dto.getUserId().toString()).isEqualTo(USER_ID_1);
+        assertThat(dto.getUserId()).hasToString(USER_ID_1);
     }
 
     @Test

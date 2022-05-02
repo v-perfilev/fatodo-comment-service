@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = FatodoCommentServiceApplication.class)
 @AutoConfigureMockMvc
-public class CommentThreadControllerIT {
+class CommentThreadControllerIT {
     private static final String ENDPOINT = "/api/threads";
 
     private static final String USER_ID = "3c300277-b5ea-48d1-80db-ead620cf5846";
@@ -64,7 +64,7 @@ public class CommentThreadControllerIT {
     Reaction reaction1;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         threadRepository.deleteAll();
         commentRepository.deleteAll();
 

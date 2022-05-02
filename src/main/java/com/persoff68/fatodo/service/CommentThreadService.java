@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +45,7 @@ public class CommentThreadService {
             permissionService.checkThreadsAdminPermission(threadList);
             List<UUID> idList = threadList.stream()
                     .map(CommentThread::getId)
-                    .collect(Collectors.toList());
+                    .toList();
             commentThreadRepository.deleteAllByIds(idList);
         }
     }

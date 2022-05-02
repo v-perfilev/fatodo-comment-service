@@ -28,7 +28,6 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(CommentController.ENDPOINT)
@@ -54,7 +53,7 @@ public class CommentController {
         PageableList<Comment> pageableList = commentService.getAllByTargetIdPageable(targetId, pageRequest);
         List<CommentDTO> dtoList = pageableList.getData().stream()
                 .map(commentMapper::pojoToDTO)
-                .collect(Collectors.toList());
+                .toList();
         PageableList<CommentDTO> dtoPageableList = PageableList.of(dtoList, pageableList.getCount());
         return ResponseEntity.ok(dtoPageableList);
     }

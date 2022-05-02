@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -87,7 +86,7 @@ public class PermissionService {
     private void checkGroupsAdminPermission(Collection<CommentThread> threadCollection) {
         List<UUID> groupIdList = threadCollection.stream()
                 .map(CommentThread::getTargetId)
-                .collect(Collectors.toList());
+                .toList();
         boolean hasPermission = itemServiceClient.canAdminGroups(groupIdList);
         if (!hasPermission) {
             throw new PermissionException();
@@ -105,7 +104,7 @@ public class PermissionService {
     private void checkItemsAdminPermission(Collection<CommentThread> threadCollection) {
         List<UUID> itemIdList = threadCollection.stream()
                 .map(CommentThread::getTargetId)
-                .collect(Collectors.toList());
+                .toList();
         boolean hasPermission = itemServiceClient.canAdminItems(itemIdList);
         if (!hasPermission) {
             throw new PermissionException();
