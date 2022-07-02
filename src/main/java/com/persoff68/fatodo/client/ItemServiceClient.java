@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 import java.util.UUID;
 
-@FeignClient(name = "item-service", primary = false)
+@FeignClient(name = "item-service", primary = false, qualifiers = {"feignItemServiceClient"})
 public interface ItemServiceClient {
 
     @GetMapping(value = "/api/permissions/group/read/{groupId}")
