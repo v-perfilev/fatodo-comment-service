@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -57,8 +56,7 @@ public class CommentThreadService {
         Optional<CommentThread> threadOptional = commentThreadRepository.findByTargetId(targetId);
         if (threadOptional.isPresent()) {
             CommentThread thread = threadOptional.get();
-            List<CommentThread> threadList = Collections.singletonList(thread);
-            permissionService.checkThreadsAdminPermission(threadList);
+            permissionService.checkThreadAdminPermission(thread);
             commentThreadRepository.delete(thread);
         }
     }

@@ -41,6 +41,15 @@ public class PermissionService {
         }
     }
 
+    public void checkThreadAdminPermission(CommentThread thread) {
+        CommentThreadType type = thread.getType();
+        switch (type) {
+            case GROUP -> checkGroupAdminPermission(thread);
+            case ITEM -> checkItemReadPermission(thread);
+            default -> throw new PermissionException();
+        }
+    }
+
     public void checkCommentPermission(UUID userId, Comment comment) {
         CommentThread thread = comment.getThread();
         checkThreadReadPermission(thread);
@@ -83,6 +92,14 @@ public class PermissionService {
         }
     }
 
+    private void checkGroupAdminPermission(CommentThread thread) {
+        UUID groupId = thread.getTargetId();
+        boolean hasPermission = itemServiceClient.canAdminGroup(groupId);
+        if (!hasPermission) {
+            throw new PermissionException();
+        }
+    }
+
     private void checkGroupsAdminPermission(Collection<CommentThread> threadCollection) {
         List<UUID> groupIdList = threadCollection.stream()
                 .map(CommentThread::getTargetId)
@@ -96,6 +113,14 @@ public class PermissionService {
     private void checkItemReadPermission(CommentThread thread) {
         UUID itemId = thread.getTargetId();
         boolean hasPermission = itemServiceClient.canReadItem(itemId);
+        if (!hasPermission) {
+            throw new PermissionException();
+        }
+    }
+
+    private void checkItemAdminPermission(CommentThread thread) {
+        UUID itemId = thread.getTargetId();
+        boolean hasPermission = itemServiceClient.canAdminItem(itemId);
         if (!hasPermission) {
             throw new PermissionException();
         }

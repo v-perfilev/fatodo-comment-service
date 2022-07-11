@@ -30,6 +30,17 @@ public class ItemServiceClientWrapper implements ItemServiceClient {
     }
 
     @Override
+    public boolean canAdminGroup(UUID groupId) {
+        try {
+            return itemServiceClient.canAdminGroup(groupId);
+        } catch (FeignException.NotFound e) {
+            throw new ModelNotFoundException();
+        } catch (Exception e) {
+            throw new ClientException();
+        }
+    }
+
+    @Override
     public boolean canAdminGroups(List<UUID> groupIdList) {
         try {
             return itemServiceClient.canAdminGroups(groupIdList);
@@ -44,6 +55,17 @@ public class ItemServiceClientWrapper implements ItemServiceClient {
     public boolean canReadItem(UUID itemId) {
         try {
             return itemServiceClient.canReadItem(itemId);
+        } catch (FeignException.NotFound e) {
+            throw new ModelNotFoundException();
+        } catch (Exception e) {
+            throw new ClientException();
+        }
+    }
+
+    @Override
+    public boolean canAdminItem(UUID itemId) {
+        try {
+            return itemServiceClient.canAdminItem(itemId);
         } catch (FeignException.NotFound e) {
             throw new ModelNotFoundException();
         } catch (Exception e) {

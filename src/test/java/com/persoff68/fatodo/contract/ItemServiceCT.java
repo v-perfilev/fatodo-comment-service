@@ -30,6 +30,12 @@ class ItemServiceCT {
     }
 
     @Test
+    void testCanAdminGroup() {
+        boolean canAdmin = itemServiceClient.canAdminGroup(UUID.randomUUID());
+        assertThat(canAdmin).isTrue();
+    }
+
+    @Test
     void testCanAdminGroups() {
         List<UUID> groupIdList = Collections.singletonList(UUID.randomUUID());
         boolean canRead = itemServiceClient.canAdminGroups(groupIdList);
@@ -43,6 +49,12 @@ class ItemServiceCT {
     }
 
     @Test
+    void testCanAdminItem() {
+        boolean canAdmin = itemServiceClient.canAdminItem(UUID.randomUUID());
+        assertThat(canAdmin).isTrue();
+    }
+
+    @Test
     void testCanAdminItems() {
         List<UUID> itemIdList = Collections.singletonList(UUID.randomUUID());
         boolean canRead = itemServiceClient.canAdminItems(itemIdList);
@@ -52,7 +64,7 @@ class ItemServiceCT {
     @Test
     void testGetTypeAndParent() {
         TypeAndParent typeAndParent = itemServiceClient.getTypeAndParent(UUID.randomUUID());
-        assertThat(typeAndParent.getType()).isEqualTo(CommentThreadType.GROUP);
+        assertThat(typeAndParent.getType()).isEqualTo(CommentThreadType.ITEM);
         assertThat(typeAndParent.getParentId()).isNotNull();
     }
 

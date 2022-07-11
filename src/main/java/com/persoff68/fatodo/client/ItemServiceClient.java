@@ -16,11 +16,17 @@ public interface ItemServiceClient {
     @GetMapping(value = "/api/permissions/group/read/{groupId}")
     boolean canReadGroup(@PathVariable UUID groupId);
 
+    @GetMapping(value = "/api/permissions/group/admin/{groupId}")
+    boolean canAdminGroup(@PathVariable UUID groupId);
+
     @PostMapping(value = "/api/permissions/groups/admin")
     boolean canAdminGroups(@RequestBody List<UUID> groupIdList);
 
     @GetMapping(value = "/api/permissions/item/read/{itemId}")
     boolean canReadItem(@PathVariable UUID itemId);
+
+    @GetMapping(value = "/api/permissions/item/admin/{itemId}")
+    boolean canAdminItem(@PathVariable UUID itemId);
 
     @PostMapping(value = "/api/permissions/items/admin")
     boolean canAdminItems(@RequestBody List<UUID> itemIdList);
