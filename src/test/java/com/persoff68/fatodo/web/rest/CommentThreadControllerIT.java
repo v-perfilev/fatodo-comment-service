@@ -21,18 +21,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = FatodoCommentServiceApplication.class)
@@ -58,6 +56,7 @@ class CommentThreadControllerIT {
     ItemServiceClient itemServiceClient;
 
     CommentThread thread1;
+    CommentThread thread2;
     Comment comment1;
     Comment comment2;
     Comment comment3;
@@ -71,21 +70,19 @@ class CommentThreadControllerIT {
         thread1 = createCommentThread();
         comment1 = createComment(thread1, null, USER_ID);
         comment2 = createComment(thread1, comment1, USER_ID);
-        comment3 = createComment(thread1, null, USER_ID);
         reaction1 = createReaction(comment1, USER_ID);
+
+        thread2 = createCommentThreadWithParentId(thread1.getParentId());
+        comment3 = createComment(thread2, null, USER_ID);
 
         when(itemServiceClient.canAdminGroups(anyList())).thenReturn(true);
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID)
-    void testDeleteAllByTargetIds_ok() throws Exception {
-        String url = ENDPOINT + "/delete";
-        List<UUID> threadIdList = Collections.singletonList(thread1.getTargetId());
-        String requestBody = objectMapper.writeValueAsString(threadIdList);
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+    void testDeleteAllByParentId_ok() throws Exception {
+        String url = ENDPOINT + "/" + thread1.getParentId() + "/parent";
+        mvc.perform(delete(url))
                 .andExpect(status().isOk());
         List<CommentThread> threadList = threadRepository.findAll();
         List<Comment> commentList = commentRepository.findAll();
@@ -97,14 +94,10 @@ class CommentThreadControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID)
-    void testDeleteAllByTargetIds_forbidden() throws Exception {
+    void testDeleteAllByParentId_forbidden() throws Exception {
         when(itemServiceClient.canAdminGroups(anyList())).thenReturn(false);
-        String url = ENDPOINT + "/delete";
-        List<UUID> threadIdList = Collections.singletonList(thread1.getTargetId());
-        String requestBody = objectMapper.writeValueAsString(threadIdList);
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+        String url = ENDPOINT + "/" + thread1.getParentId() + "/parent";
+        mvc.perform(delete(url))
                 .andExpect(status().isForbidden());
         List<CommentThread> threadList = threadRepository.findAll();
         assertThat(threadList).isNotEmpty();
@@ -112,18 +105,51 @@ class CommentThreadControllerIT {
 
     @Test
     @WithAnonymousUser
-    void testDeleteAllByTargetIds_unauthorized() throws Exception {
-        String url = ENDPOINT + "/delete";
-        List<UUID> threadIdList = Collections.singletonList(UUID.randomUUID());
-        String requestBody = objectMapper.writeValueAsString(threadIdList);
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+    void testDeleteAllByParentId_unauthorized() throws Exception {
+        String url = ENDPOINT + "/" + thread1.getParentId() + "/parent";
+        mvc.perform(delete(url))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID)
+    void testDeleteByTargetId_ok() throws Exception {
+        String url = ENDPOINT + "/" + thread2.getTargetId() + "/target";
+        mvc.perform(delete(url))
+                .andExpect(status().isOk());
+        List<CommentThread> threadList = threadRepository.findAll();
+        List<Comment> commentList = commentRepository.findAll();
+        List<Reaction> reactionList = reactionRepository.findAll();
+        assertThat(threadList).hasSize(1);
+        assertThat(commentList).hasSize(2);
+        assertThat(reactionList).hasSize(1);
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID)
+    void testDeleteByTargetId_forbidden() throws Exception {
+        when(itemServiceClient.canAdminGroups(anyList())).thenReturn(false);
+        String url = ENDPOINT + "/" + thread2.getTargetId() + "/target";
+        mvc.perform(delete(url))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testDeleteByTargetId_unauthorized() throws Exception {
+        String url = ENDPOINT + "/" + thread2.getTargetId() + "/target";
+        mvc.perform(delete(url))
                 .andExpect(status().isUnauthorized());
     }
 
     private CommentThread createCommentThread() {
         CommentThread thread = TestCommentThread.defaultBuilder().type(CommentThreadType.GROUP).build().toParent();
+        return threadRepository.saveAndFlush(thread);
+    }
+
+    private CommentThread createCommentThreadWithParentId(UUID parentId) {
+        CommentThread thread = TestCommentThread.defaultBuilder()
+                .parentId(parentId).type(CommentThreadType.GROUP).build().toParent();
         return threadRepository.saveAndFlush(thread);
     }
 

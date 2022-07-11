@@ -12,11 +12,13 @@ public class TestCommentThread extends CommentThread {
 
     @Builder
     public TestCommentThread(UUID id,
+                             UUID parentId,
                              UUID targetId,
                              CommentThreadType type,
                              List<Comment> comments) {
         super();
         super.setId(id);
+        super.setParentId(parentId);
         super.setTargetId(targetId);
         super.setType(type);
         super.setComments(comments);
@@ -24,6 +26,7 @@ public class TestCommentThread extends CommentThread {
 
     public static TestCommentThreadBuilder defaultBuilder() {
         return TestCommentThread.builder()
+                .parentId(UUID.randomUUID())
                 .targetId(UUID.randomUUID())
                 .type(CommentThreadType.GROUP);
     }
@@ -31,6 +34,7 @@ public class TestCommentThread extends CommentThread {
     public CommentThread toParent() {
         CommentThread thread = new CommentThread();
         thread.setId(getId());
+        thread.setParentId(getParentId());
         thread.setTargetId(getTargetId());
         thread.setType(getType());
         thread.setComments(getComments());

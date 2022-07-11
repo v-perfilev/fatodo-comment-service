@@ -6,6 +6,8 @@ import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.PageableList;
+import com.persoff68.fatodo.model.TypeAndParent;
+import com.persoff68.fatodo.model.constant.CommentThreadType;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,8 +61,8 @@ class CommentServiceIT {
         threadRepository.deleteAll();
         commentRepository.deleteAll();
 
-        when(itemServiceClient.isGroup(any())).thenReturn(false);
-        when(itemServiceClient.isItem(any())).thenReturn(true);
+        TypeAndParent typeAndParent = new TypeAndParent(CommentThreadType.ITEM, UUID.randomUUID());
+        when(itemServiceClient.getTypeAndParent(any())).thenReturn(typeAndParent);
         when(itemServiceClient.canReadItem(any())).thenReturn(true);
 
         doNothing().when(wsServiceClient).sendCommentNewEvent(any());

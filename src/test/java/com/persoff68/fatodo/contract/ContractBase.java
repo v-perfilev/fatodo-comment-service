@@ -34,6 +34,7 @@ import static org.mockito.Mockito.when;
 @Transactional
 public abstract class ContractBase {
     private static final UUID USER_ID = UUID.fromString("8f9a7cae-73c8-4ad6-b135-5bd109b51d2e");
+    private static final UUID PARENT_ID = UUID.fromString("06a8e075-1781-4ba9-8096-1d5777b8b09e");
     private static final UUID TARGET_ID = UUID.fromString("b73e8418-ff4a-472b-893d-4e248ae93797");
     private static final UUID COMMENT_ID_1 = UUID.fromString("6796a82a-93c6-4fdf-bf5d-2da77ce2c338");
     private static final UUID COMMENT_ID_2 = UUID.fromString("6520f3e6-0a7f-4c32-b6f8-ba5ae3ed0bd1");
@@ -63,7 +64,7 @@ public abstract class ContractBase {
         commentRepository.deleteAll();
         commentRepository.deleteAll();
 
-        CommentThread thread1 = createCommentThread(TARGET_ID);
+        CommentThread thread1 = createCommentThread(PARENT_ID, TARGET_ID);
         Comment comment1 = createComment(COMMENT_ID_1, thread1, null, USER_ID);
         Comment comment2 = createComment(COMMENT_ID_2, thread1, comment1, UUID.randomUUID());
         createReaction(comment2.getId(), USER_ID);
@@ -75,8 +76,9 @@ public abstract class ContractBase {
         when(itemServiceClient.canAdminGroups(any())).thenReturn(true);
     }
 
-    private CommentThread createCommentThread(UUID targetId) {
+    private CommentThread createCommentThread(UUID parentId, UUID targetId) {
         CommentThread thread = TestCommentThread.defaultBuilder()
+                .parentId(parentId)
                 .targetId(targetId)
                 .type(CommentThreadType.GROUP)
                 .build().toParent();

@@ -11,6 +11,10 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
+            <column name="parent_id" type="binary(16)">
+                <constraints nullable="false"/>
+            </column>
+
             <column name="target_id" type="binary(16)">
                 <constraints nullable="false"/>
             </column>
@@ -20,7 +24,11 @@
             </column>
         </createTable>
 
-        <createIndex indexName="index_comment_thread" tableName="ftd_comment_thread">
+        <createIndex indexName="index_comment_thread_parent" tableName="ftd_comment_thread">
+            <column name="parent_id"/>
+        </createIndex>
+
+        <createIndex indexName="index_comment_thread_target" tableName="ftd_comment_thread">
             <column name="target_id"/>
         </createIndex>
 

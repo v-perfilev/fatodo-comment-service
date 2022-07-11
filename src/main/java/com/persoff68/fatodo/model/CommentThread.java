@@ -29,6 +29,9 @@ import java.util.UUID;
 public class CommentThread extends AbstractModel {
 
     @NotNull
+    private UUID parentId;
+
+    @NotNull
     private UUID targetId;
 
     @NotNull
@@ -38,8 +41,9 @@ public class CommentThread extends AbstractModel {
     @OneToMany(mappedBy = "thread", cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
-    public static CommentThread of(UUID targetId, CommentThreadType type) {
+    public static CommentThread of(UUID parentId, UUID targetId, CommentThreadType type) {
         CommentThread thread = new CommentThread();
+        thread.setParentId(parentId);
         thread.setTargetId(targetId);
         thread.setType(type);
         return thread;

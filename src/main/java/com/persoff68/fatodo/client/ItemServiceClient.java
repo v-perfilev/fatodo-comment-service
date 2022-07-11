@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.client;
 
+import com.persoff68.fatodo.model.TypeAndParent;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,11 +25,8 @@ public interface ItemServiceClient {
     @PostMapping(value = "/api/permissions/items/admin")
     boolean canAdminItems(@RequestBody List<UUID> itemIdList);
 
-    @GetMapping(value = "/api/check/is-group/{groupId}")
-    boolean isGroup(@PathVariable UUID groupId);
-
-    @GetMapping(value = "/api/check/is-item/{itemId}")
-    boolean isItem(@PathVariable UUID itemId);
+    @GetMapping(value = "/api/check/type-and-parent/{id}")
+    TypeAndParent getTypeAndParent(@PathVariable UUID id);
 
     @GetMapping(value = "/api/members/group/{groupId}/ids")
     List<UUID> getUserIdsByGroupId(@PathVariable UUID groupId);

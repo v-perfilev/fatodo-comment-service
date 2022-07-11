@@ -12,10 +12,12 @@ import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.PageableList;
+import com.persoff68.fatodo.model.TypeAndParent;
 import com.persoff68.fatodo.model.constant.CommentThreadType;
 import com.persoff68.fatodo.model.dto.CommentDTO;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
+import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.web.rest.vm.CommentVM;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +36,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -87,6 +90,8 @@ class CommentControllerIT {
         doNothing().when(wsServiceClient).sendCommentUpdateEvent(any());
         doNothing().when(wsServiceClient).sendReactionsEvent(any());
 
+        TypeAndParent typeAndParent = new TypeAndParent(CommentThreadType.ITEM, UUID.randomUUID());
+        when(itemServiceClient.getTypeAndParent(any())).thenReturn(typeAndParent);
         when(itemServiceClient.canReadGroup(any())).thenReturn(true);
     }
 
@@ -150,8 +155,6 @@ class CommentControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testAdd_ok_newThread() throws Exception {
         UUID newTargetId = UUID.randomUUID();
-        when(itemServiceClient.isGroup(newTargetId)).thenReturn(false);
-        when(itemServiceClient.isItem(newTargetId)).thenReturn(true);
         when(itemServiceClient.canReadItem(newTargetId)).thenReturn(true);
         String url = ENDPOINT + "/" + newTargetId;
         CommentVM vm = TestCommentVM.defaultBuilder().build().toParent();
@@ -199,8 +202,6 @@ class CommentControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testAdd_forbidden_wrongPermission() throws Exception {
         UUID newTargetId = UUID.randomUUID();
-        when(itemServiceClient.isGroup(newTargetId)).thenReturn(false);
-        when(itemServiceClient.isItem(newTargetId)).thenReturn(true);
         when(itemServiceClient.canReadItem(newTargetId)).thenReturn(false);
         String url = ENDPOINT + "/" + newTargetId;
         CommentVM vm = TestCommentVM.defaultBuilder().build().toParent();
@@ -215,8 +216,7 @@ class CommentControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testAdd_notFound() throws Exception {
         UUID newTargetId = UUID.randomUUID();
-        when(itemServiceClient.isGroup(newTargetId)).thenReturn(false);
-        when(itemServiceClient.isItem(newTargetId)).thenReturn(false);
+        doThrow(new ModelNotFoundException()).when(itemServiceClient).getTypeAndParent(newTargetId);
         String url = ENDPOINT + "/" + newTargetId;
         CommentVM vm = TestCommentVM.defaultBuilder().build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
@@ -230,8 +230,6 @@ class CommentControllerIT {
     @WithAnonymousUser
     void testAdd_unauthorized() throws Exception {
         UUID newTargetId = UUID.randomUUID();
-        when(itemServiceClient.isGroup(newTargetId)).thenReturn(false);
-        when(itemServiceClient.isItem(newTargetId)).thenReturn(false);
         String url = ENDPOINT + "/" + newTargetId;
         CommentVM vm = TestCommentVM.defaultBuilder().build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);

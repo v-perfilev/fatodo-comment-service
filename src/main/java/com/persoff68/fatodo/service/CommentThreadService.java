@@ -2,6 +2,7 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.model.CommentThread;
+import com.persoff68.fatodo.model.TypeAndParent;
 import com.persoff68.fatodo.model.constant.CommentThreadType;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
@@ -9,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -26,8 +29,10 @@ public class CommentThreadService {
             permissionService.checkThreadReadPermission(thread);
             return thread;
         } catch (ModelNotFoundException e) {
-            CommentThreadType type = getTypeByTargetId(targetId);
-            CommentThread threadToCreate = CommentThread.of(targetId, type);
+            TypeAndParent typeAndParent = getTypeByTargetId(targetId);
+            UUID parentId = typeAndParent.getParentId();
+            CommentThreadType type = typeAndParent.getType();
+            CommentThread threadToCreate = CommentThread.of(parentId, targetId, type);
             permissionService.checkThreadReadPermission(threadToCreate);
             return commentThreadRepository.save(threadToCreate);
         }
@@ -39,27 +44,27 @@ public class CommentThreadService {
     }
 
     @Transactional
-    public void deleteByTargetIds(List<UUID> targetIdList) {
-        List<CommentThread> threadList = commentThreadRepository.findAllByThreadIds(targetIdList);
+    public void deleteAllByParentId(UUID parentId) {
+        List<CommentThread> threadList = commentThreadRepository.findByParentId(parentId);
         if (!threadList.isEmpty()) {
             permissionService.checkThreadsAdminPermission(threadList);
-            List<UUID> idList = threadList.stream()
-                    .map(CommentThread::getId)
-                    .toList();
-            commentThreadRepository.deleteAllByIds(idList);
+            commentThreadRepository.deleteAll(threadList);
         }
     }
 
-    private CommentThreadType getTypeByTargetId(UUID targetId) {
-        boolean isGroup = itemServiceClient.isGroup(targetId);
-        if (isGroup) {
-            return CommentThreadType.GROUP;
+    @Transactional
+    public void deleteByTargetId(UUID targetId) {
+        Optional<CommentThread> threadOptional = commentThreadRepository.findByTargetId(targetId);
+        if (threadOptional.isPresent()) {
+            CommentThread thread = threadOptional.get();
+            List<CommentThread> threadList = Collections.singletonList(thread);
+            permissionService.checkThreadsAdminPermission(threadList);
+            commentThreadRepository.delete(thread);
         }
-        boolean isItem = itemServiceClient.isItem(targetId);
-        if (isItem) {
-            return CommentThreadType.ITEM;
-        }
-        throw new ModelNotFoundException();
+    }
+
+    private TypeAndParent getTypeByTargetId(UUID targetId) {
+        return itemServiceClient.getTypeAndParent(targetId);
     }
 
 }

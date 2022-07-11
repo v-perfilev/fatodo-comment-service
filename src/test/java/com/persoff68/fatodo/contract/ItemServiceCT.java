@@ -1,6 +1,8 @@
 package com.persoff68.fatodo.contract;
 
 import com.persoff68.fatodo.client.ItemServiceClient;
+import com.persoff68.fatodo.model.TypeAndParent;
+import com.persoff68.fatodo.model.constant.CommentThreadType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,15 +50,10 @@ class ItemServiceCT {
     }
 
     @Test
-    void testIsGroup() {
-        boolean isGroup = itemServiceClient.isGroup(UUID.randomUUID());
-        assertThat(isGroup).isTrue();
-    }
-
-    @Test
-    void testIsItem() {
-        boolean isItem = itemServiceClient.isItem(UUID.randomUUID());
-        assertThat(isItem).isTrue();
+    void testGetTypeAndParent() {
+        TypeAndParent typeAndParent = itemServiceClient.getTypeAndParent(UUID.randomUUID());
+        assertThat(typeAndParent.getType()).isEqualTo(CommentThreadType.GROUP);
+        assertThat(typeAndParent.getParentId()).isNotNull();
     }
 
     @Test
