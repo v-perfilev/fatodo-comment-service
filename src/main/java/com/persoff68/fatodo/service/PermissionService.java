@@ -66,18 +66,6 @@ public class PermissionService {
         }
     }
 
-    private void checkOwnComment(UUID userId, Comment comment) {
-        if (!userId.equals(comment.getUserId())) {
-            throw new PermissionException();
-        }
-    }
-
-    private void checkNotOwnComment(UUID userId, Comment comment) {
-        if (userId.equals(comment.getUserId())) {
-            throw new PermissionException();
-        }
-    }
-
     private void checkGroupsPermission(String permission, List<UUID> groupIdList) {
         boolean hasPermission = itemServiceClient.hasGroupsPermission(permission, groupIdList);
         if (!hasPermission) {
@@ -88,6 +76,18 @@ public class PermissionService {
     private void checkItemsPermission(String permission, List<UUID> itemIdList) {
         boolean hasPermission = itemServiceClient.hasItemsPermission(permission, itemIdList);
         if (!hasPermission) {
+            throw new PermissionException();
+        }
+    }
+
+    private void checkOwnComment(UUID userId, Comment comment) {
+        if (!userId.equals(comment.getUserId())) {
+            throw new PermissionException();
+        }
+    }
+
+    private void checkNotOwnComment(UUID userId, Comment comment) {
+        if (userId.equals(comment.getUserId())) {
             throw new PermissionException();
         }
     }

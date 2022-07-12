@@ -12,7 +12,7 @@
             </column>
 
             <column name="thread_id" type="binary(16)">
-                <constraints foreignKeyName="fk_thread" references="ftd_comment_thread(id)" deleteCascade="true"
+                <constraints foreignKeyName="fk_comment_thread" references="ftd_comment_thread(id)" deleteCascade="true"
                              nullable="false"/>
             </column>
 
