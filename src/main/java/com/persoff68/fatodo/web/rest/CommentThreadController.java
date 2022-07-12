@@ -2,13 +2,18 @@ package com.persoff68.fatodo.web.rest;
 
 import com.persoff68.fatodo.service.CommentThreadService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -19,6 +24,12 @@ public class CommentThreadController {
     static final String ENDPOINT = "/api/threads";
 
     private final CommentThreadService commentThreadService;
+
+    @PostMapping(value = "/count-map", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<UUID, Integer>> getCountMapByTargetIds(@RequestBody List<UUID> targetIdList) {
+        Map<UUID, Integer> countMap = commentThreadService.getCountByTargetIds(targetIdList);
+        return ResponseEntity.ok(countMap);
+    }
 
     @DeleteMapping("/{parentId}/parent")
     public ResponseEntity<Void> deleteAllByParentId(@PathVariable UUID parentId) {

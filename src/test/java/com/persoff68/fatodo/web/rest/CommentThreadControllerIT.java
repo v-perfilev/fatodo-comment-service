@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.web.rest;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.persoff68.fatodo.FatodoCommentServiceApplication;
 import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
@@ -21,16 +22,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = FatodoCommentServiceApplication.class)
@@ -77,6 +83,46 @@ class CommentThreadControllerIT {
 
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
     }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID)
+    void testGetCountMapByTargetIds_ok() throws Exception {
+        String url = ENDPOINT + "/count-map";
+        List<UUID> targetIdMap = List.of(thread1.getTargetId(), thread2.getTargetId());
+        String requestBody = objectMapper.writeValueAsString(targetIdMap);
+        ResultActions resultActions = mvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isOk());
+        String resultString = resultActions.andReturn().getResponse().getContentAsString();
+        JavaType javaType = objectMapper.getTypeFactory().constructMapType(HashMap.class, UUID.class, Long.class);
+        Map<UUID, Long> countMap = objectMapper.readValue(resultString, javaType);
+        assertThat(countMap).hasSize(2);
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID)
+    void testGetCountMapByTargetIds_forbidden() throws Exception {
+        when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(false);
+        String url = ENDPOINT + "/count-map";
+        List<UUID> targetIdMap = List.of(thread1.getTargetId(), thread2.getTargetId());
+        String requestBody = objectMapper.writeValueAsString(targetIdMap);
+        mvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testGetCountMapByTargetIds_unauthorized() throws Exception {
+        when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(false);
+        String url = ENDPOINT + "/count-map";
+        List<UUID> targetIdMap = List.of(thread1.getTargetId(), thread2.getTargetId());
+        String requestBody = objectMapper.writeValueAsString(targetIdMap);
+        mvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isUnauthorized());
+    }
+
 
     @Test
     @WithCustomSecurityContext(id = USER_ID)
