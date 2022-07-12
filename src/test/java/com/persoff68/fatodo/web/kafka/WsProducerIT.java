@@ -85,7 +85,7 @@ public class WsProducerIT {
 
     @BeforeEach
     void setup() {
-        when(itemServiceClient.canReadGroup(UUID.fromString(TARGET_ID))).thenReturn(true);
+        when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
 
         thread = createCommentThread(TARGET_ID);
         comment = createComment(thread, null, USER_ID_1);

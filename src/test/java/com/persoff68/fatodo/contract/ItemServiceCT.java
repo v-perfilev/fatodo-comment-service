@@ -24,40 +24,16 @@ class ItemServiceCT {
     ItemServiceClient itemServiceClient;
 
     @Test
-    void testCanReadGroup() {
-        boolean canRead = itemServiceClient.canReadGroup(UUID.randomUUID());
+    void testHasGroupsPermission() {
+        List<UUID> targetIdList = Collections.singletonList(UUID.randomUUID());
+        boolean canRead = itemServiceClient.hasGroupsPermission("READ", targetIdList);
         assertThat(canRead).isTrue();
     }
 
     @Test
-    void testCanAdminGroup() {
-        boolean canAdmin = itemServiceClient.canAdminGroup(UUID.randomUUID());
-        assertThat(canAdmin).isTrue();
-    }
-
-    @Test
-    void testCanAdminGroups() {
-        List<UUID> groupIdList = Collections.singletonList(UUID.randomUUID());
-        boolean canRead = itemServiceClient.canAdminGroups(groupIdList);
-        assertThat(canRead).isTrue();
-    }
-
-    @Test
-    void testCanReadItem() {
-        boolean canRead = itemServiceClient.canReadItem(UUID.randomUUID());
-        assertThat(canRead).isTrue();
-    }
-
-    @Test
-    void testCanAdminItem() {
-        boolean canAdmin = itemServiceClient.canAdminItem(UUID.randomUUID());
-        assertThat(canAdmin).isTrue();
-    }
-
-    @Test
-    void testCanAdminItems() {
-        List<UUID> itemIdList = Collections.singletonList(UUID.randomUUID());
-        boolean canRead = itemServiceClient.canAdminItems(itemIdList);
+    void testHasItemsPermission() {
+        List<UUID> targetIdList = Collections.singletonList(UUID.randomUUID());
+        boolean canRead = itemServiceClient.hasItemsPermission("READ", targetIdList);
         assertThat(canRead).isTrue();
     }
 

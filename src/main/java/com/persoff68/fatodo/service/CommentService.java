@@ -26,7 +26,7 @@ public class CommentService {
 
     public PageableList<Comment> getAllByTargetIdPageable(UUID targetId, Pageable pageable) {
         CommentThread thread = threadService.getByTargetId(targetId);
-        permissionService.checkThreadReadPermission(thread);
+        permissionService.checkThreadPermission("READ", thread);
         Page<Comment> commentPage = commentRepository.findAllByThreadId(thread.getId(), pageable);
         return PageableList.of(commentPage.getContent(), commentPage.getTotalElements());
     }
@@ -81,7 +81,7 @@ public class CommentService {
         if (!thread.getTargetId().equals(targetId)) {
             throw new ModelInvalidException();
         }
-        permissionService.checkThreadReadPermission(thread);
+        permissionService.checkThreadPermission("READ", thread);
         comment = Comment.of(userId, thread, reference, text);
         return comment;
     }

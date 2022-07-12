@@ -19,9 +19,9 @@ public class ItemServiceClientWrapper implements ItemServiceClient {
     private final ItemServiceClient itemServiceClient;
 
     @Override
-    public boolean canReadGroup(UUID groupId) {
+    public boolean hasGroupsPermission(String permission, List<UUID> groupIdList) {
         try {
-            return itemServiceClient.canReadGroup(groupId);
+            return itemServiceClient.hasGroupsPermission(permission, groupIdList);
         } catch (FeignException.NotFound e) {
             throw new ModelNotFoundException();
         } catch (Exception e) {
@@ -30,53 +30,9 @@ public class ItemServiceClientWrapper implements ItemServiceClient {
     }
 
     @Override
-    public boolean canAdminGroup(UUID groupId) {
+    public boolean hasItemsPermission(String permission, List<UUID> itemIdList) {
         try {
-            return itemServiceClient.canAdminGroup(groupId);
-        } catch (FeignException.NotFound e) {
-            throw new ModelNotFoundException();
-        } catch (Exception e) {
-            throw new ClientException();
-        }
-    }
-
-    @Override
-    public boolean canAdminGroups(List<UUID> groupIdList) {
-        try {
-            return itemServiceClient.canAdminGroups(groupIdList);
-        } catch (FeignException.NotFound e) {
-            throw new ModelNotFoundException();
-        } catch (Exception e) {
-            throw new ClientException();
-        }
-    }
-
-    @Override
-    public boolean canReadItem(UUID itemId) {
-        try {
-            return itemServiceClient.canReadItem(itemId);
-        } catch (FeignException.NotFound e) {
-            throw new ModelNotFoundException();
-        } catch (Exception e) {
-            throw new ClientException();
-        }
-    }
-
-    @Override
-    public boolean canAdminItem(UUID itemId) {
-        try {
-            return itemServiceClient.canAdminItem(itemId);
-        } catch (FeignException.NotFound e) {
-            throw new ModelNotFoundException();
-        } catch (Exception e) {
-            throw new ClientException();
-        }
-    }
-
-    @Override
-    public boolean canAdminItems(List<UUID> itemIdList) {
-        try {
-            return itemServiceClient.canAdminItems(itemIdList);
+            return itemServiceClient.hasItemsPermission(permission, itemIdList);
         } catch (FeignException.NotFound e) {
             throw new ModelNotFoundException();
         } catch (Exception e) {

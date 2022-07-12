@@ -80,12 +80,12 @@ class ReactionControllerIT {
         comment4 = createComment(thread2, USER_ID_2);
 
         doNothing().when(wsServiceClient).sendReactionsEvent(any());
+        when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetLike_ok() throws Exception {
-        when(itemServiceClient.canReadGroup(any())).thenReturn(true);
         String commentId = comment1.getId().toString();
         String url = ENDPOINT + "/like/" + commentId;
         mvc.perform(get(url))
@@ -101,7 +101,6 @@ class ReactionControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetLike_ok_wasDislike() throws Exception {
-        when(itemServiceClient.canReadGroup(any())).thenReturn(true);
         String commentId = comment3.getId().toString();
         String url = ENDPOINT + "/like/" + commentId;
         mvc.perform(get(url))
@@ -117,7 +116,6 @@ class ReactionControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetLike_forbidden_ownMessage() throws Exception {
-        when(itemServiceClient.canReadGroup(any())).thenReturn(true);
         String commentId = comment2.getId().toString();
         String url = ENDPOINT + "/like/" + commentId;
         mvc.perform(get(url))
@@ -127,7 +125,7 @@ class ReactionControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetLike_forbidden_noPermissions() throws Exception {
-        when(itemServiceClient.canReadGroup(any())).thenReturn(false);
+        when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(false);
         String commentId = comment4.getId().toString();
         String url = ENDPOINT + "/like/" + commentId;
         mvc.perform(get(url))
@@ -156,7 +154,6 @@ class ReactionControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetDislike_ok() throws Exception {
-        when(itemServiceClient.canReadGroup(any())).thenReturn(true);
         String commentId = comment1.getId().toString();
         String url = ENDPOINT + "/dislike/" + commentId;
         mvc.perform(get(url))
@@ -173,7 +170,6 @@ class ReactionControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetDislike_forbidden_ownMessage() throws Exception {
-        when(itemServiceClient.canReadGroup(any())).thenReturn(true);
         String commentId = comment2.getId().toString();
         String url = ENDPOINT + "/dislike/" + commentId;
         mvc.perform(get(url))
@@ -183,7 +179,7 @@ class ReactionControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetDislike_forbidden_noPermissions() throws Exception {
-        when(itemServiceClient.canReadGroup(any())).thenReturn(false);
+        when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(false);
         String commentId = comment4.getId().toString();
         String url = ENDPOINT + "/dislike/" + commentId;
         mvc.perform(get(url))
@@ -212,7 +208,6 @@ class ReactionControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetNone_ok() throws Exception {
-        when(itemServiceClient.canReadGroup(any())).thenReturn(true);
         String commentId = comment3.getId().toString();
         String url = ENDPOINT + "/none/" + commentId;
         mvc.perform(get(url))
@@ -228,7 +223,6 @@ class ReactionControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetNone_forbidden_ownMessage() throws Exception {
-        when(itemServiceClient.canReadGroup(any())).thenReturn(true);
         String commentId = comment2.getId().toString();
         String url = ENDPOINT + "/none/" + commentId;
         mvc.perform(get(url))
@@ -238,7 +232,7 @@ class ReactionControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetNone_forbidden_noPermissions() throws Exception {
-        when(itemServiceClient.canReadGroup(any())).thenReturn(false);
+        when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(false);
         String commentId = comment4.getId().toString();
         String url = ENDPOINT + "/none/" + commentId;
         mvc.perform(get(url))

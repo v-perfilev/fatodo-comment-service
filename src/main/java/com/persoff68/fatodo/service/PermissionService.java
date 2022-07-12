@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -22,55 +23,48 @@ public class PermissionService {
 
     private final ItemServiceClient itemServiceClient;
 
-    public void checkThreadsAdminPermission(Collection<CommentThread> threadCollection) {
+    public void checkThreadsPermission(String permission, Collection<CommentThread> threadCollection) {
         Multimap<CommentThreadType, CommentThread> threadMultimap = threadCollection.stream()
                 .collect(Multimaps.toMultimap(
                         CommentThread::getType,
                         Function.identity(),
                         HashMultimap::create
                 ));
-        threadMultimap.keySet().forEach(key -> checkSameTypeThreadsAdminPermission(key, threadMultimap.get(key)));
+        threadMultimap.keySet().forEach(key -> checkSameTypeThreadsPermission(key, permission,
+                threadMultimap.get(key)));
     }
 
-    public void checkThreadReadPermission(CommentThread thread) {
+    public void checkThreadPermission(String permission, CommentThread thread) {
         CommentThreadType type = thread.getType();
+        UUID targetId = thread.getTargetId();
+        List<UUID> targetIdList = Collections.singletonList(targetId);
         switch (type) {
-            case GROUP -> checkGroupReadPermission(thread);
-            case ITEM -> checkItemReadPermission(thread);
-            default -> throw new PermissionException();
-        }
-    }
-
-    public void checkThreadAdminPermission(CommentThread thread) {
-        CommentThreadType type = thread.getType();
-        switch (type) {
-            case GROUP -> checkGroupAdminPermission(thread);
-            case ITEM -> checkItemReadPermission(thread);
+            case GROUP -> checkGroupsPermission(permission, targetIdList);
+            case ITEM -> checkItemsPermission(permission, targetIdList);
             default -> throw new PermissionException();
         }
     }
 
     public void checkCommentPermission(UUID userId, Comment comment) {
-        CommentThread thread = comment.getThread();
-        checkThreadReadPermission(thread);
+        checkThreadPermission("READ", comment.getThread());
         checkOwnComment(userId, comment);
     }
 
     public void checkReactionPermission(UUID userId, Comment comment) {
-        CommentThread thread = comment.getThread();
-        checkThreadReadPermission(thread);
+        checkThreadPermission("READ", comment.getThread());
         checkNotOwnComment(userId, comment);
     }
 
-    private void checkSameTypeThreadsAdminPermission(CommentThreadType type,
-                                                     Collection<CommentThread> threadCollection) {
+    private void checkSameTypeThreadsPermission(CommentThreadType type,
+                                                String permission,
+                                                Collection<CommentThread> threadCollection) {
+        List<UUID> targetIdList = threadCollection.stream().map(CommentThread::getTargetId).toList();
         switch (type) {
-            case GROUP -> checkGroupsAdminPermission(threadCollection);
-            case ITEM -> checkItemsAdminPermission(threadCollection);
+            case GROUP -> checkGroupsPermission(permission, targetIdList);
+            case ITEM -> checkItemsPermission(permission, targetIdList);
             default -> throw new PermissionException();
         }
     }
-
 
     private void checkOwnComment(UUID userId, Comment comment) {
         if (!userId.equals(comment.getUserId())) {
@@ -84,53 +78,15 @@ public class PermissionService {
         }
     }
 
-    private void checkGroupReadPermission(CommentThread thread) {
-        UUID groupId = thread.getTargetId();
-        boolean hasPermission = itemServiceClient.canReadGroup(groupId);
+    private void checkGroupsPermission(String permission, List<UUID> groupIdList) {
+        boolean hasPermission = itemServiceClient.hasGroupsPermission(permission, groupIdList);
         if (!hasPermission) {
             throw new PermissionException();
         }
     }
 
-    private void checkGroupAdminPermission(CommentThread thread) {
-        UUID groupId = thread.getTargetId();
-        boolean hasPermission = itemServiceClient.canAdminGroup(groupId);
-        if (!hasPermission) {
-            throw new PermissionException();
-        }
-    }
-
-    private void checkGroupsAdminPermission(Collection<CommentThread> threadCollection) {
-        List<UUID> groupIdList = threadCollection.stream()
-                .map(CommentThread::getTargetId)
-                .toList();
-        boolean hasPermission = itemServiceClient.canAdminGroups(groupIdList);
-        if (!hasPermission) {
-            throw new PermissionException();
-        }
-    }
-
-    private void checkItemReadPermission(CommentThread thread) {
-        UUID itemId = thread.getTargetId();
-        boolean hasPermission = itemServiceClient.canReadItem(itemId);
-        if (!hasPermission) {
-            throw new PermissionException();
-        }
-    }
-
-    private void checkItemAdminPermission(CommentThread thread) {
-        UUID itemId = thread.getTargetId();
-        boolean hasPermission = itemServiceClient.canAdminItem(itemId);
-        if (!hasPermission) {
-            throw new PermissionException();
-        }
-    }
-
-    private void checkItemsAdminPermission(Collection<CommentThread> threadCollection) {
-        List<UUID> itemIdList = threadCollection.stream()
-                .map(CommentThread::getTargetId)
-                .toList();
-        boolean hasPermission = itemServiceClient.canAdminItems(itemIdList);
+    private void checkItemsPermission(String permission, List<UUID> itemIdList) {
+        boolean hasPermission = itemServiceClient.hasItemsPermission(permission, itemIdList);
         if (!hasPermission) {
             throw new PermissionException();
         }

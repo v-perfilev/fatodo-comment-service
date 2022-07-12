@@ -25,14 +25,14 @@ public class CommentThreadService {
     public CommentThread getByTargetIdOrCreate(UUID targetId) {
         try {
             CommentThread thread = getByTargetId(targetId);
-            permissionService.checkThreadReadPermission(thread);
+            permissionService.checkThreadPermission("READ", thread);
             return thread;
         } catch (ModelNotFoundException e) {
             TypeAndParent typeAndParent = getTypeByTargetId(targetId);
             UUID parentId = typeAndParent.getParentId();
             CommentThreadType type = typeAndParent.getType();
             CommentThread threadToCreate = CommentThread.of(parentId, targetId, type);
-            permissionService.checkThreadReadPermission(threadToCreate);
+            permissionService.checkThreadPermission("READ", threadToCreate);
             return commentThreadRepository.save(threadToCreate);
         }
     }
@@ -46,7 +46,7 @@ public class CommentThreadService {
     public void deleteAllByParentId(UUID parentId) {
         List<CommentThread> threadList = commentThreadRepository.findByParentId(parentId);
         if (!threadList.isEmpty()) {
-            permissionService.checkThreadsAdminPermission(threadList);
+            permissionService.checkThreadsPermission("ADMIN", threadList);
             commentThreadRepository.deleteAll(threadList);
         }
     }
@@ -56,7 +56,7 @@ public class CommentThreadService {
         Optional<CommentThread> threadOptional = commentThreadRepository.findByTargetId(targetId);
         if (threadOptional.isPresent()) {
             CommentThread thread = threadOptional.get();
-            permissionService.checkThreadAdminPermission(thread);
+            permissionService.checkThreadPermission("ADMIN", thread);
             commentThreadRepository.delete(thread);
         }
     }

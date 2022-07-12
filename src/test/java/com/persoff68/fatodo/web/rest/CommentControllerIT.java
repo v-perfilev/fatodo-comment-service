@@ -92,7 +92,7 @@ class CommentControllerIT {
 
         TypeAndParent typeAndParent = new TypeAndParent(CommentThreadType.ITEM, UUID.randomUUID());
         when(itemServiceClient.getTypeAndParent(any())).thenReturn(typeAndParent);
-        when(itemServiceClient.canReadGroup(any())).thenReturn(true);
+        when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
     }
 
     @Test
@@ -155,7 +155,7 @@ class CommentControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testAdd_ok_newThread() throws Exception {
         UUID newTargetId = UUID.randomUUID();
-        when(itemServiceClient.canReadItem(newTargetId)).thenReturn(true);
+        when(itemServiceClient.hasItemsPermission(any(), any())).thenReturn(true);
         String url = ENDPOINT + "/" + newTargetId;
         CommentVM vm = TestCommentVM.defaultBuilder().build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
@@ -202,7 +202,7 @@ class CommentControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testAdd_forbidden_wrongPermission() throws Exception {
         UUID newTargetId = UUID.randomUUID();
-        when(itemServiceClient.canReadItem(newTargetId)).thenReturn(false);
+        when(itemServiceClient.hasItemsPermission(any(), any())).thenReturn(false);
         String url = ENDPOINT + "/" + newTargetId;
         CommentVM vm = TestCommentVM.defaultBuilder().build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
@@ -269,7 +269,7 @@ class CommentControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testEdit_forbidden_wrongPermission() throws Exception {
-        when(itemServiceClient.canReadGroup(any())).thenReturn(false);
+        when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(false);
         String url = ENDPOINT + "/" + comment3.getId();
         CommentVM vm = TestCommentVM.defaultBuilder().text("new").build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
@@ -322,7 +322,7 @@ class CommentControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testDelete_forbidden_wrongPermission() throws Exception {
-        when(itemServiceClient.canReadGroup(any())).thenReturn(false);
+        when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(false);
         String url = ENDPOINT + "/" + comment3.getId();
         mvc.perform(delete(url))
                 .andExpect(status().isForbidden());

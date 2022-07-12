@@ -63,7 +63,7 @@ class CommentServiceIT {
 
         TypeAndParent typeAndParent = new TypeAndParent(CommentThreadType.ITEM, UUID.randomUUID());
         when(itemServiceClient.getTypeAndParent(any())).thenReturn(typeAndParent);
-        when(itemServiceClient.canReadItem(any())).thenReturn(true);
+        when(itemServiceClient.hasItemsPermission(any(), any())).thenReturn(true);
 
         doNothing().when(wsServiceClient).sendCommentNewEvent(any());
 

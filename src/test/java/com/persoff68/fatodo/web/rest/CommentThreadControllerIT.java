@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -75,7 +75,7 @@ class CommentThreadControllerIT {
         thread2 = createCommentThreadWithParentId(thread1.getParentId());
         comment3 = createComment(thread2, null, USER_ID);
 
-        when(itemServiceClient.canAdminGroups(anyList())).thenReturn(true);
+        when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
     }
 
     @Test
@@ -95,7 +95,7 @@ class CommentThreadControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID)
     void testDeleteAllByParentId_forbidden() throws Exception {
-        when(itemServiceClient.canAdminGroups(anyList())).thenReturn(false);
+        when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(false);
         String url = ENDPOINT + "/" + thread1.getParentId() + "/parent";
         mvc.perform(delete(url))
                 .andExpect(status().isForbidden());
@@ -128,7 +128,7 @@ class CommentThreadControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID)
     void testDeleteByTargetId_forbidden() throws Exception {
-        when(itemServiceClient.canAdminGroups(anyList())).thenReturn(false);
+        when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(false);
         String url = ENDPOINT + "/" + thread2.getTargetId() + "/target";
         mvc.perform(delete(url))
                 .andExpect(status().isForbidden());

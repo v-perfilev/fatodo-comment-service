@@ -72,8 +72,7 @@ public abstract class ContractBase {
         doNothing().when(wsServiceClient).sendCommentNewEvent(any());
         doNothing().when(wsServiceClient).sendCommentUpdateEvent(any());
 
-        when(itemServiceClient.canReadGroup(any())).thenReturn(true);
-        when(itemServiceClient.canAdminGroups(any())).thenReturn(true);
+        when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
     }
 
     private CommentThread createCommentThread(UUID parentId, UUID targetId) {
