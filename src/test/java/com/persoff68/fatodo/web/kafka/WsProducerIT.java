@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
 })
 @DirtiesContext
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
-public class WsProducerIT {
+class WsProducerIT {
 
     private static final String TARGET_ID = "357a2a99-7b7e-4336-9cd7-18f2cf73fab9";
     private static final String USER_ID_1 = "3c300277-b5ea-48d1-80db-ead620cf5846";
@@ -108,7 +108,7 @@ public class WsProducerIT {
 
         ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
 
-        assertThat(wsServiceClient instanceof WsProducer).isTrue();
+        assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(record).isNotNull();
         assertThat(record.key()).isEqualTo("new");
         verify(wsServiceClient).sendCommentNewEvent(any());
@@ -120,7 +120,7 @@ public class WsProducerIT {
 
         ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
 
-        assertThat(wsServiceClient instanceof WsProducer).isTrue();
+        assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(record).isNotNull();
         assertThat(record.key()).isEqualTo("update");
         verify(wsServiceClient).sendCommentUpdateEvent(any());
@@ -132,7 +132,7 @@ public class WsProducerIT {
 
         ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
 
-        assertThat(wsServiceClient instanceof WsProducer).isTrue();
+        assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(record).isNotNull();
         assertThat(record.key()).isEqualTo("reactions");
         verify(wsServiceClient).sendReactionsEvent(any());

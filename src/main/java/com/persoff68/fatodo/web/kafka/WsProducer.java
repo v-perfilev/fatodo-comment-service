@@ -14,19 +14,21 @@ import org.springframework.stereotype.Component;
 @ConditionalOnPropertyNotNull(value = "kafka.bootstrapAddress")
 public class WsProducer implements WsServiceClient {
 
+    private static final String WS_COMMENT_TOPIC = "ws_comment";
+
     private final KafkaTemplate<String, WsEventDTO<CommentDTO>> wsEventCommentKafkaTemplate;
     private final KafkaTemplate<String, WsEventDTO<ReactionsDTO>> wsEventReactionsKafkaTemplate;
 
     public void sendCommentNewEvent(WsEventDTO<CommentDTO> event) {
-        wsEventCommentKafkaTemplate.send("ws_comment", "new", event);
+        wsEventCommentKafkaTemplate.send(WS_COMMENT_TOPIC, "new", event);
     }
 
     public void sendCommentUpdateEvent(WsEventDTO<CommentDTO> event) {
-        wsEventCommentKafkaTemplate.send("ws_comment", "update", event);
+        wsEventCommentKafkaTemplate.send(WS_COMMENT_TOPIC, "update", event);
     }
 
     public void sendReactionsEvent(WsEventDTO<ReactionsDTO> event) {
-        wsEventReactionsKafkaTemplate.send("ws_comment", "reactions", event);
+        wsEventReactionsKafkaTemplate.send(WS_COMMENT_TOPIC, "reactions", event);
     }
 
 }
