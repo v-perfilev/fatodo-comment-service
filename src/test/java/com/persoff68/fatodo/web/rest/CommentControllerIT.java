@@ -18,7 +18,7 @@ import com.persoff68.fatodo.model.dto.CommentDTO;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
-import com.persoff68.fatodo.web.rest.vm.CommentVM;
+import com.persoff68.fatodo.model.vm.CommentVM;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

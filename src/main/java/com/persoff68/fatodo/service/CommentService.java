@@ -4,9 +4,10 @@ import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.repository.CommentRepository;
+import com.persoff68.fatodo.service.client.PermissionService;
 import com.persoff68.fatodo.service.exception.ModelInvalidException;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
-import com.persoff68.fatodo.service.ws.WsService;
+import com.persoff68.fatodo.service.client.WsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,9 +20,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CommentService {
 
-    private final CommentRepository commentRepository;
     private final CommentThreadService threadService;
     private final PermissionService permissionService;
+    private final CommentRepository commentRepository;
     private final WsService wsService;
 
     public PageableList<Comment> getAllByTargetIdPageable(UUID targetId, Pageable pageable) {

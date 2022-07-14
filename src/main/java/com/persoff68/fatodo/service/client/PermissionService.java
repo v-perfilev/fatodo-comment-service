@@ -1,4 +1,4 @@
-package com.persoff68.fatodo.service;
+package com.persoff68.fatodo.service.client;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;

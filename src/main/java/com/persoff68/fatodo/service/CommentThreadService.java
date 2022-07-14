@@ -6,6 +6,7 @@ import com.persoff68.fatodo.model.CommentThreadAndCount;
 import com.persoff68.fatodo.model.TypeAndParent;
 import com.persoff68.fatodo.model.constant.CommentThreadType;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
+import com.persoff68.fatodo.service.client.PermissionService;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommentThreadService {
 
-    private final CommentThreadRepository commentThreadRepository;
     private final PermissionService permissionService;
+    private final CommentThreadRepository commentThreadRepository;
     private final ItemServiceClient itemServiceClient;
 
     public CommentThread getByTargetIdOrCreate(UUID targetId) {

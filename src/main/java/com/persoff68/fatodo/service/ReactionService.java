@@ -6,8 +6,9 @@ import com.persoff68.fatodo.model.ReactionId;
 import com.persoff68.fatodo.model.constant.ReactionType;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.ReactionRepository;
+import com.persoff68.fatodo.service.client.PermissionService;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
-import com.persoff68.fatodo.service.ws.WsService;
+import com.persoff68.fatodo.service.client.WsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +21,10 @@ import java.util.UUID;
 @Transactional
 public class ReactionService {
 
-    private final ReactionRepository reactionRepository;
-    private final CommentRepository commentRepository;
     private final PermissionService permissionService;
     private final EntityManager entityManager;
+    private final ReactionRepository reactionRepository;
+    private final CommentRepository commentRepository;
     private final WsService wsService;
 
     public void setLike(UUID userId, UUID messageId) {

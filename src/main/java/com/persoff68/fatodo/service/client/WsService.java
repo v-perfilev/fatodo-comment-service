@@ -1,4 +1,4 @@
-package com.persoff68.fatodo.service.ws;
+package com.persoff68.fatodo.service.client;
 
 import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
@@ -8,7 +8,7 @@ import com.persoff68.fatodo.model.constant.CommentThreadType;
 import com.persoff68.fatodo.model.dto.CommentDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.WsEventDTO;
-import com.persoff68.fatodo.model.mapper.CommentMapper;
+import com.persoff68.fatodo.mapper.CommentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
