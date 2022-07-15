@@ -29,7 +29,7 @@ import java.util.UUID;
 @Table(name = "ftd_comment_reaction")
 @Data
 @NoArgsConstructor
-@IdClass(ReactionId.class)
+@IdClass(Reaction.ReactionId.class)
 @ToString(exclude = {"comment"})
 public class Reaction {
 
