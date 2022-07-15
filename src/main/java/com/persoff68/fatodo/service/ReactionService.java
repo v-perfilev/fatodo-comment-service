@@ -2,13 +2,12 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.Reaction;
-import com.persoff68.fatodo.model.ReactionId;
 import com.persoff68.fatodo.model.constant.ReactionType;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.ReactionRepository;
 import com.persoff68.fatodo.service.client.PermissionService;
-import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.client.WsService;
+import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +39,7 @@ public class ReactionService {
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.checkReactionPermission(userId, comment);
 
-        ReactionId id = new ReactionId(commentId, userId);
+        Reaction.ReactionId id = new Reaction.ReactionId(commentId, userId);
         reactionRepository.findById(id).ifPresent(reactionRepository::delete);
         reactionRepository.flush();
 
@@ -55,7 +54,7 @@ public class ReactionService {
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.checkReactionPermission(userId, comment);
 
-        ReactionId id = new ReactionId(commentId, userId);
+        Reaction.ReactionId id = new Reaction.ReactionId(commentId, userId);
         Reaction reaction = reactionRepository.findById(id)
                 .orElse(new Reaction(commentId, userId, type));
         reaction.setType(type);

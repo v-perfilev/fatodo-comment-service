@@ -5,13 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TypeAndParent implements Serializable {
+public class TypeAndParent {
     private CommentThreadType type;
     private UUID parentId;
 }
