@@ -12,8 +12,11 @@ import java.util.UUID;
 public class CommentDTO extends AbstractAuditingDTO {
 
     private UUID threadId;
+
     private UUID targetId;
+
     private UUID userId;
+
     private String text;
 
     @JsonProperty("isDeleted")

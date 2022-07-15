@@ -10,5 +10,7 @@ public class CommentVM {
 
     @NotEmpty
     private String text;
+
     private UUID referenceId;
+
 }

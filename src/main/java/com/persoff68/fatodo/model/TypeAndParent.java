@@ -11,7 +11,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TypeAndParent {
+
     private CommentThreadType type;
+
     private UUID parentId;
+
 }
 

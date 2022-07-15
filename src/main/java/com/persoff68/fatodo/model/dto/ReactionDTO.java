@@ -10,7 +10,11 @@ import java.util.UUID;
 public class ReactionDTO {
 
     private UUID commentId;
+
     private UUID userId;
+
     private ReactionType type;
+
     private Date timestamp;
+
 }

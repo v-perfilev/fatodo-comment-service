@@ -9,7 +9,9 @@ import java.util.UUID;
 public class ReactionsDTO {
 
     private UUID threadId;
+
     private UUID targetId;
+
     private UUID commentId;
 
     private List<ReactionDTO> reactions;

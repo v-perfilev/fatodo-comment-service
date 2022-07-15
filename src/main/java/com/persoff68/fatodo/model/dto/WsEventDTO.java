@@ -11,6 +11,7 @@ import java.util.UUID;
 public class WsEventDTO<T> {
 
     private final List<UUID> userIds;
+
     private final T content;
 
 }
