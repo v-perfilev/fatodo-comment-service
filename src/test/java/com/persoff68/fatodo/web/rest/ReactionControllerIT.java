@@ -6,6 +6,7 @@ import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.builder.TestComment;
 import com.persoff68.fatodo.builder.TestCommentThread;
 import com.persoff68.fatodo.builder.TestReaction;
+import com.persoff68.fatodo.client.EventServiceClient;
 import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Comment;
@@ -58,6 +59,8 @@ class ReactionControllerIT {
     ItemServiceClient itemServiceClient;
     @MockBean
     WsServiceClient wsServiceClient;
+    @MockBean
+    EventServiceClient eventServiceClient;
 
     Comment comment1;
     Comment comment2;
@@ -80,6 +83,7 @@ class ReactionControllerIT {
         comment4 = createComment(thread2, USER_ID_2);
 
         doNothing().when(wsServiceClient).sendReactionsEvent(any());
+        doNothing().when(eventServiceClient).addCommentEvent(any());
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
     }
 

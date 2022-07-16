@@ -23,6 +23,15 @@ public class PermissionService {
 
     private final ItemServiceClient itemServiceClient;
 
+    public List<UUID> getThreadUserIds(CommentThread thread) {
+        CommentThreadType type = thread.getType();
+        if (type.equals(CommentThreadType.GROUP)) {
+            return itemServiceClient.getUserIdsByGroupId(thread.getTargetId());
+        } else {
+            return itemServiceClient.getUserIdsByItemId(thread.getTargetId());
+        }
+    }
+
     public void checkThreadsPermission(String permission, Collection<CommentThread> threadCollection) {
         Multimap<CommentThreadType, CommentThread> threadMultimap = threadCollection.stream()
                 .collect(Multimaps.toMultimap(

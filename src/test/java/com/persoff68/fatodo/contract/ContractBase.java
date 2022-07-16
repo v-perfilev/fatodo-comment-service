@@ -3,6 +3,7 @@ package com.persoff68.fatodo.contract;
 import com.persoff68.fatodo.builder.TestComment;
 import com.persoff68.fatodo.builder.TestCommentThread;
 import com.persoff68.fatodo.builder.TestReaction;
+import com.persoff68.fatodo.client.EventServiceClient;
 import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Comment;
@@ -55,6 +56,8 @@ public abstract class ContractBase {
     ItemServiceClient itemServiceClient;
     @MockBean
     WsServiceClient wsServiceClient;
+    @MockBean
+    EventServiceClient eventServiceClient;
 
     @BeforeEach
     public void setup() {
@@ -71,6 +74,7 @@ public abstract class ContractBase {
 
         doNothing().when(wsServiceClient).sendCommentNewEvent(any());
         doNothing().when(wsServiceClient).sendCommentUpdateEvent(any());
+        doNothing().when(eventServiceClient).addCommentEvent(any());
 
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
     }

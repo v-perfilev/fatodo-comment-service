@@ -1,6 +1,7 @@
 package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.FatodoCommentServiceApplication;
+import com.persoff68.fatodo.client.EventServiceClient;
 import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Comment;
@@ -50,6 +51,8 @@ class CommentServiceIT {
     ItemServiceClient itemServiceClient;
     @MockBean
     WsServiceClient wsServiceClient;
+    @MockBean
+    EventServiceClient eventServiceClient;
 
     CommentThread thread;
     Comment comment1;
@@ -66,6 +69,7 @@ class CommentServiceIT {
         when(itemServiceClient.hasItemsPermission(any(), any())).thenReturn(true);
 
         doNothing().when(wsServiceClient).sendCommentNewEvent(any());
+        doNothing().when(eventServiceClient).addCommentEvent(any());
 
         this.comment1 = commentService.add(USER_1_ID, TARGET_ID, "test", null);
         this.comment2 = commentService.add(USER_1_ID, TARGET_ID, "test", this.comment1.getId());

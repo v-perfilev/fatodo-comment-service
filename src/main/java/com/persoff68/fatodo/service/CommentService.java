@@ -4,6 +4,7 @@ import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.repository.CommentRepository;
+import com.persoff68.fatodo.service.client.EventService;
 import com.persoff68.fatodo.service.client.PermissionService;
 import com.persoff68.fatodo.service.exception.ModelInvalidException;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
@@ -24,6 +25,7 @@ public class CommentService {
     private final PermissionService permissionService;
     private final CommentRepository commentRepository;
     private final WsService wsService;
+    private final EventService eventService;
 
     public PageableList<Comment> getAllByTargetIdPageable(UUID targetId, Pageable pageable) {
         CommentThread thread = threadService.getByTargetId(targetId);
@@ -41,6 +43,8 @@ public class CommentService {
 
         // WS
         wsService.sendCommentNewEvent(comment);
+        // EVENT
+        eventService.sendCommentAddEvent(comment);
 
         return comment;
     }

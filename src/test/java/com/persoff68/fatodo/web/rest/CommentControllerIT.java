@@ -7,6 +7,7 @@ import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.builder.TestComment;
 import com.persoff68.fatodo.builder.TestCommentThread;
 import com.persoff68.fatodo.builder.TestCommentVM;
+import com.persoff68.fatodo.client.EventServiceClient;
 import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Comment;
@@ -66,6 +67,8 @@ class CommentControllerIT {
     ItemServiceClient itemServiceClient;
     @MockBean
     WsServiceClient wsServiceClient;
+    @MockBean
+    EventServiceClient eventServiceClient;
 
     CommentThread thread1;
     CommentThread thread2;
@@ -89,6 +92,7 @@ class CommentControllerIT {
         doNothing().when(wsServiceClient).sendCommentNewEvent(any());
         doNothing().when(wsServiceClient).sendCommentUpdateEvent(any());
         doNothing().when(wsServiceClient).sendReactionsEvent(any());
+        doNothing().when(eventServiceClient).addCommentEvent(any());
 
         TypeAndParent typeAndParent = new TypeAndParent(CommentThreadType.ITEM, UUID.randomUUID());
         when(itemServiceClient.getTypeAndParent(any())).thenReturn(typeAndParent);

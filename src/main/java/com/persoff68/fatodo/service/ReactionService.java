@@ -5,6 +5,7 @@ import com.persoff68.fatodo.model.Reaction;
 import com.persoff68.fatodo.model.constant.ReactionType;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.ReactionRepository;
+import com.persoff68.fatodo.service.client.EventService;
 import com.persoff68.fatodo.service.client.PermissionService;
 import com.persoff68.fatodo.service.client.WsService;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
@@ -25,6 +26,7 @@ public class ReactionService {
     private final ReactionRepository reactionRepository;
     private final CommentRepository commentRepository;
     private final WsService wsService;
+    private final EventService eventService;
 
     public void setLike(UUID userId, UUID messageId) {
         set(userId, messageId, ReactionType.LIKE);
@@ -47,6 +49,8 @@ public class ReactionService {
 
         // WS
         wsService.sendCommentReactionEvent(comment);
+        // EVENT
+        eventService.sendCommentReactionEvent(userId, comment, null);
     }
 
     protected void set(UUID userId, UUID commentId, ReactionType type) {
@@ -63,6 +67,8 @@ public class ReactionService {
 
         // WS
         wsService.sendCommentReactionEvent(comment);
+        // EVENT
+        eventService.sendCommentReactionEvent(userId, comment, type);
     }
 
 }
