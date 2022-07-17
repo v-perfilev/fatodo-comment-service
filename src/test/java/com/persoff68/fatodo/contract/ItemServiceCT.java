@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.contract;
 
+import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.model.TypeAndParent;
 import com.persoff68.fatodo.model.constant.CommentThreadType;
@@ -24,6 +25,7 @@ class ItemServiceCT {
     ItemServiceClient itemServiceClient;
 
     @Test
+    @WithCustomSecurityContext
     void testHasGroupsPermission() {
         List<UUID> targetIdList = Collections.singletonList(UUID.randomUUID());
         boolean canRead = itemServiceClient.hasGroupsPermission("READ", targetIdList);
@@ -31,6 +33,7 @@ class ItemServiceCT {
     }
 
     @Test
+    @WithCustomSecurityContext
     void testHasItemsPermission() {
         List<UUID> targetIdList = Collections.singletonList(UUID.randomUUID());
         boolean canRead = itemServiceClient.hasItemsPermission("READ", targetIdList);
@@ -38,6 +41,7 @@ class ItemServiceCT {
     }
 
     @Test
+    @WithCustomSecurityContext
     void testGetTypeAndParent() {
         TypeAndParent typeAndParent = itemServiceClient.getTypeAndParent(UUID.randomUUID());
         assertThat(typeAndParent.getType()).isEqualTo(CommentThreadType.ITEM);
@@ -45,12 +49,14 @@ class ItemServiceCT {
     }
 
     @Test
+    @WithCustomSecurityContext
     void testGetGroupUserIds() {
         List<UUID> userIdList = itemServiceClient.getUserIdsByGroupId(UUID.randomUUID());
         assertThat(userIdList).isNotEmpty();
     }
 
     @Test
+    @WithCustomSecurityContext
     void testGetItemUserIds() {
         List<UUID> userIdList = itemServiceClient.getUserIdsByItemId(UUID.randomUUID());
         assertThat(userIdList).isNotEmpty();
