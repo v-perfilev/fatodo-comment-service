@@ -31,7 +31,7 @@ public class EventService {
         recipientIdList.remove(userId);
         CreateCommentEventDTO dto = CreateCommentEventDTO.commentAdd(recipientIdList, userId,
                 parentId, targetId, commentId);
-        addCommentEvent(dto);
+        addCommentEventAsync(dto);
     }
 
     public void sendCommentReactionEvent(UUID userId, Comment comment, ReactionType reaction) {
@@ -43,11 +43,11 @@ public class EventService {
         String reactionName = reaction != null ? reaction.name() : null;
         CreateCommentEventDTO dto = CreateCommentEventDTO.commentReaction(recipientId, userId,
                 parentId, targetId, commentId, reactionName);
-        addCommentEvent(dto);
+        addCommentEventAsync(dto);
     }
 
     @Async
-    public void addCommentEvent(CreateCommentEventDTO createCommentEventDTO) {
+    public void addCommentEventAsync(CreateCommentEventDTO createCommentEventDTO) {
         eventServiceClient.addCommentEvent(createCommentEventDTO);
     }
 }
