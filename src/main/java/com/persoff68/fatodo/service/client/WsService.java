@@ -10,14 +10,15 @@ import com.persoff68.fatodo.model.dto.WsEventDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Async
-public class WsService {
+@Transactional
+public class WsService implements WsServiceClient {
 
     private final WsServiceClient wsServiceClient;
     private final PermissionService permissionService;
@@ -28,7 +29,7 @@ public class WsService {
         List<UUID> userIdList = permissionService.getThreadUserIds(thread);
         CommentDTO commentDTO = commentMapper.pojoToDTO(comment);
         WsEventDTO<CommentDTO> eventDTO = new WsEventDTO<>(userIdList, commentDTO);
-        wsServiceClient.sendCommentNewEvent(eventDTO);
+        sendCommentNewEvent(eventDTO);
     }
 
     public void sendCommentUpdateEvent(Comment comment) {
@@ -36,7 +37,7 @@ public class WsService {
         List<UUID> userIdList = permissionService.getThreadUserIds(thread);
         CommentDTO commentDTO = commentMapper.pojoToDTO(comment);
         WsEventDTO<CommentDTO> eventDTO = new WsEventDTO<>(userIdList, commentDTO);
-        wsServiceClient.sendCommentUpdateEvent(eventDTO);
+        sendCommentUpdateEvent(eventDTO);
     }
 
     public void sendCommentReactionEvent(Comment comment) {
@@ -44,8 +45,21 @@ public class WsService {
         List<UUID> userIdList = permissionService.getThreadUserIds(thread);
         ReactionsDTO reactionsDTO = commentMapper.pojoToReactionsDTO(comment);
         WsEventDTO<ReactionsDTO> eventDTO = new WsEventDTO<>(userIdList, reactionsDTO);
-        wsServiceClient.sendReactionsEvent(eventDTO);
+        sendReactionsEvent(eventDTO);
     }
 
+    @Async
+    public void sendCommentNewEvent(WsEventDTO<CommentDTO> event) {
+        wsServiceClient.sendCommentNewEvent(event);
+    }
 
+    @Async
+    public void sendCommentUpdateEvent(WsEventDTO<CommentDTO> event) {
+        wsServiceClient.sendCommentUpdateEvent(event);
+    }
+
+    @Async
+    public void sendReactionsEvent(WsEventDTO<ReactionsDTO> event) {
+        wsServiceClient.sendReactionsEvent(event);
+    }
 }
