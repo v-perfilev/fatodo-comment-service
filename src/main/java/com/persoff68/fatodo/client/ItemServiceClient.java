@@ -19,8 +19,14 @@ public interface ItemServiceClient {
     @PostMapping(value = "/api/permissions/groups/{permission}")
     boolean hasGroupsPermission(@PathVariable String permission, @RequestBody List<UUID> groupIdList);
 
+    @PostMapping(value = "/api/permissions/groups/{permission}/ids")
+    List<UUID> getAllowedGroupIds(@PathVariable String permission, @RequestBody List<UUID> groupIdList);
+
     @PostMapping(value = "/api/permissions/items/{permission}")
     boolean hasItemsPermission(@PathVariable String permission, @RequestBody List<UUID> itemIdList);
+
+    @PostMapping(value = "/api/permissions/items/{permission}/ids")
+    List<UUID> getAllowedItemIds(@PathVariable String permission, @RequestBody List<UUID> itemIdList);
 
     @GetMapping(value = "/api/check/type-and-parent/{id}")
     TypeAndParent getTypeAndParent(@PathVariable UUID id);

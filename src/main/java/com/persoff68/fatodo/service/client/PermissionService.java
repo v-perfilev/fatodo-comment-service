@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,26 @@ public class PermissionService {
         } else {
             return itemServiceClient.getUserIdsByItemId(thread.getTargetId());
         }
+    }
+
+    public List<CommentThread> filterAllowedThreads(String permission, List<CommentThread> threadList) {
+        List<UUID> groupTargetIdList = threadList.stream()
+                .filter(t -> t.getType().equals(CommentThreadType.GROUP))
+                .map(CommentThread::getTargetId)
+                .toList();
+        List<UUID> itemTargetIdList = threadList.stream()
+                .filter(t -> t.getType().equals(CommentThreadType.ITEM))
+                .map(CommentThread::getTargetId)
+                .toList();
+
+        List<UUID> allowedGroupIdList = itemServiceClient.getAllowedGroupIds(permission, groupTargetIdList);
+        List<UUID> allowedItemIdList = itemServiceClient.getAllowedItemIds(permission, itemTargetIdList);
+        List<UUID> allowedTargetIdList = Stream.concat(allowedGroupIdList.stream(),
+                allowedItemIdList.stream()).toList();
+
+        return threadList.stream()
+                .filter(thread -> allowedTargetIdList.contains(thread.getTargetId()))
+                .toList();
     }
 
     public void checkThreadsPermission(String permission, Collection<CommentThread> threadCollection) {

@@ -3,6 +3,7 @@ package com.persoff68.fatodo.mapper;
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.dto.CommentDTO;
+import com.persoff68.fatodo.model.dto.CommentInfoDTO;
 import com.persoff68.fatodo.model.dto.ReactionDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.ReferenceCommentDTO;
@@ -28,6 +29,8 @@ public abstract class CommentMapper {
     abstract CommentDTO defaultPojoToDTO(Comment comment);
 
     abstract ReferenceCommentDTO defaultPojoToReferenceDTO(Comment comment);
+
+    public abstract CommentInfoDTO pojoToInfoDTO(Comment comment);
 
     public CommentDTO pojoToDTO(Comment comment) {
         if (comment == null) {

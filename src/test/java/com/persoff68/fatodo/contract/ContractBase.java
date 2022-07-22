@@ -24,6 +24,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -77,6 +78,8 @@ public abstract class ContractBase {
         doNothing().when(eventServiceClient).addCommentEvent(any());
 
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
+        when(itemServiceClient.getAllowedGroupIds(any(), any())).thenReturn(List.of(PARENT_ID, TARGET_ID));
+        when(itemServiceClient.getAllowedItemIds(any(), any())).thenReturn(List.of(PARENT_ID, TARGET_ID));
     }
 
     private CommentThread createCommentThread(UUID parentId, UUID targetId) {

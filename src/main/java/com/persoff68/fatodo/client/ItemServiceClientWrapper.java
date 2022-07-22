@@ -30,11 +30,29 @@ public class ItemServiceClientWrapper implements ItemServiceClient {
     }
 
     @Override
+    public List<UUID> getAllowedGroupIds(String permission, List<UUID> groupIdList) {
+        try {
+            return itemServiceClient.getAllowedGroupIds(permission, groupIdList);
+        } catch (Exception e) {
+            throw new ClientException();
+        }
+    }
+
+    @Override
     public boolean hasItemsPermission(String permission, List<UUID> itemIdList) {
         try {
             return itemServiceClient.hasItemsPermission(permission, itemIdList);
         } catch (FeignException.NotFound e) {
             throw new ModelNotFoundException();
+        } catch (Exception e) {
+            throw new ClientException();
+        }
+    }
+
+    @Override
+    public List<UUID> getAllowedItemIds(String permission, List<UUID> itemIdList) {
+        try {
+            return itemServiceClient.getAllowedItemIds(permission, itemIdList);
         } catch (Exception e) {
             throw new ClientException();
         }

@@ -6,15 +6,16 @@ import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.service.client.EventService;
 import com.persoff68.fatodo.service.client.PermissionService;
+import com.persoff68.fatodo.service.client.WsService;
 import com.persoff68.fatodo.service.exception.ModelInvalidException;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
-import com.persoff68.fatodo.service.client.WsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -32,6 +33,15 @@ public class CommentService {
         permissionService.checkThreadPermission("READ", thread);
         Page<Comment> commentPage = commentRepository.findAllByThreadId(thread.getId(), pageable);
         return PageableList.of(commentPage.getContent(), commentPage.getTotalElements());
+    }
+
+    public List<Comment> getAllAllowedByIds(List<UUID> commentIdList) {
+        List<Comment> commentList = commentRepository.findAllByIds(commentIdList);
+        List<CommentThread> threadList = commentList.stream().map(Comment::getThread).distinct().toList();
+        List<CommentThread> allowedThreadList = permissionService.filterAllowedThreads("READ", threadList);
+        return commentList.stream()
+                .filter(comment -> allowedThreadList.contains(comment.getThread()))
+                .toList();
     }
 
     @Transactional

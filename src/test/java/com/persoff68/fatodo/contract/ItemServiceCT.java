@@ -34,10 +34,26 @@ class ItemServiceCT {
 
     @Test
     @WithCustomSecurityContext
+    void testGetAllowedGroupIds() {
+        List<UUID> targetIdList = Collections.singletonList(UUID.randomUUID());
+        List<UUID> groupIdList = itemServiceClient.getAllowedGroupIds("READ", targetIdList);
+        assertThat(groupIdList).isNotEmpty();
+    }
+
+    @Test
+    @WithCustomSecurityContext
     void testHasItemsPermission() {
         List<UUID> targetIdList = Collections.singletonList(UUID.randomUUID());
         boolean canRead = itemServiceClient.hasItemsPermission("READ", targetIdList);
         assertThat(canRead).isTrue();
+    }
+
+    @Test
+    @WithCustomSecurityContext
+    void testGetAllowedItemIds() {
+        List<UUID> targetIdList = Collections.singletonList(UUID.randomUUID());
+        List<UUID> itemIdList = itemServiceClient.getAllowedItemIds("READ", targetIdList);
+        assertThat(itemIdList).isNotEmpty();
     }
 
     @Test

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -19,6 +20,12 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
             order by c.createdAt desc
             """)
     Page<Comment> findAllByThreadId(@Param("threadId") UUID threadId, Pageable pageable);
+
+    @Query("""
+            select distinct c from Comment c
+            where c.id in :commentIds
+            """)
+    List<Comment> findAllByIds(@Param("commentIds") List<UUID> commentIds);
 
 }
 
