@@ -34,7 +34,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 public class CommentController {
-    static final String ENDPOINT = "/api/comments";
+    static final String ENDPOINT = "/api/comment";
 
     private static final int DEFAULT_SIZE = 30;
 

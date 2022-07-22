@@ -8,8 +8,8 @@ Contract.make {
     request {
         method DELETE()
         url($(
-                consumer(regex("/api/comments/" + uuid().toString())),
-                producer("/api/comments/6796a82a-93c6-4fdf-bf5d-2da77ce2c338")
+                consumer(regex("/api/comment/" + uuid().toString())),
+                producer("/api/comment/6796a82a-93c6-4fdf-bf5d-2da77ce2c338")
         ))
         headers {
             header 'Authorization': $(

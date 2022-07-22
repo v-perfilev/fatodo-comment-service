@@ -8,9 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -26,8 +26,8 @@ public class InfoController {
     private final CommentService commentService;
     private final CommentMapper commentMapper;
 
-    @PostMapping(value = "/comments", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<CommentInfoDTO>> getAllCommentInfoByIds(@RequestBody List<UUID> commentIdList) {
+    @GetMapping(value = "/comment", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<CommentInfoDTO>> getAllCommentInfoByIds(@RequestParam("ids") List<UUID> commentIdList) {
         List<Comment> commentList = commentService.getAllAllowedByIds(commentIdList);
         List<CommentInfoDTO> dtoList = commentList.stream()
                 .map(commentMapper::pojoToInfoDTO)

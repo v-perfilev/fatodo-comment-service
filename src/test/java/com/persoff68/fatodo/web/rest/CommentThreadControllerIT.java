@@ -16,13 +16,13 @@ import com.persoff68.fatodo.model.constant.ReactionType;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
 import com.persoff68.fatodo.repository.ReactionRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -36,13 +36,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = FatodoCommentServiceApplication.class)
 @AutoConfigureMockMvc
 class CommentThreadControllerIT {
-    private static final String ENDPOINT = "/api/threads";
+    private static final String ENDPOINT = "/api/thread";
 
     private static final String USER_ID = "3c300277-b5ea-48d1-80db-ead620cf5846";
 
@@ -70,9 +70,6 @@ class CommentThreadControllerIT {
 
     @BeforeEach
     void setup() {
-        threadRepository.deleteAll();
-        commentRepository.deleteAll();
-
         thread1 = createCommentThread();
         comment1 = createComment(thread1, null, USER_ID);
         comment2 = createComment(thread1, comment1, USER_ID);
@@ -84,14 +81,18 @@ class CommentThreadControllerIT {
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
     }
 
+    @AfterEach
+    void cleanup() {
+        threadRepository.deleteAll();
+        commentRepository.deleteAll();
+    }
+
     @Test
     @WithCustomSecurityContext(id = USER_ID)
     void testGetCountMapByTargetIds_ok() throws Exception {
-        String url = ENDPOINT + "/count-map";
-        List<UUID> targetIdMap = List.of(thread1.getTargetId(), thread2.getTargetId());
-        String requestBody = objectMapper.writeValueAsString(targetIdMap);
-        ResultActions resultActions = mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String params = String.join(",", thread1.getTargetId().toString(), thread2.getTargetId().toString());
+        String url = ENDPOINT + "/count?ids=" + params;
+        ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         JavaType javaType = objectMapper.getTypeFactory().constructMapType(HashMap.class, UUID.class, Long.class);
@@ -103,11 +104,9 @@ class CommentThreadControllerIT {
     @WithCustomSecurityContext(id = USER_ID)
     void testGetCountMapByTargetIds_forbidden() throws Exception {
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(false);
-        String url = ENDPOINT + "/count-map";
-        List<UUID> targetIdMap = List.of(thread1.getTargetId(), thread2.getTargetId());
-        String requestBody = objectMapper.writeValueAsString(targetIdMap);
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String params = String.join(",", thread1.getTargetId().toString(), thread2.getTargetId().toString());
+        String url = ENDPOINT + "/count?ids=" + params;
+        ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isForbidden());
     }
 
@@ -115,11 +114,9 @@ class CommentThreadControllerIT {
     @WithAnonymousUser
     void testGetCountMapByTargetIds_unauthorized() throws Exception {
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(false);
-        String url = ENDPOINT + "/count-map";
-        List<UUID> targetIdMap = List.of(thread1.getTargetId(), thread2.getTargetId());
-        String requestBody = objectMapper.writeValueAsString(targetIdMap);
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String params = String.join(",", thread1.getTargetId().toString(), thread2.getTargetId().toString());
+        String url = ENDPOINT + "/count?ids=" + params;
+        mvc.perform(get(url))
                 .andExpect(status().isUnauthorized());
     }
 

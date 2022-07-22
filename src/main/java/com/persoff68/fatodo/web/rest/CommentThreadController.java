@@ -6,10 +6,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -21,12 +21,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 public class CommentThreadController {
-    static final String ENDPOINT = "/api/threads";
+    static final String ENDPOINT = "/api/thread";
 
     private final CommentThreadService commentThreadService;
 
-    @PostMapping(value = "/count-map", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<UUID, Integer>> getCountMapByTargetIds(@RequestBody List<UUID> targetIdList) {
+    @GetMapping(value = "/count", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<UUID, Integer>> getCountMapByTargetIds(@RequestParam("ids") List<UUID> targetIdList) {
         Map<UUID, Integer> countMap = commentThreadService.getCountByTargetIds(targetIdList);
         return ResponseEntity.ok(countMap);
     }

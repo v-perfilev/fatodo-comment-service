@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -32,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = FatodoCommentServiceApplication.class)
@@ -75,19 +74,14 @@ class InfoControllerIT {
     void cleanup() {
         threadRepository.deleteAll();
         commentRepository.deleteAll();
-
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void getAllCommentInfoByIds_ok() throws Exception {
-        String url = ENDPOINT + "/comments";
-        List<UUID> idList = List.of(comment1.getId(), comment2.getId());
-        String requestBody = objectMapper.writeValueAsString(idList);
-        ResultActions resultActions = mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isOk());
+        String params = String.join(",", comment1.getId().toString(), comment2.getId().toString());
+        String url = ENDPOINT + "/comment?ids=" + params;
+        ResultActions resultActions = mvc.perform(get(url)).andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         JavaType javaType = objectMapper.getTypeFactory().constructCollectionType(List.class, CommentInfoDTO.class);
         List<CommentInfoDTO> resultList = objectMapper.readValue(resultString, javaType);
@@ -97,13 +91,9 @@ class InfoControllerIT {
     @Test
     @WithAnonymousUser
     void getAllCommentInfoByIds_unauthorized() throws Exception {
-        String url = ENDPOINT + "/comments";
-        List<UUID> idList = List.of(comment1.getId(), comment2.getId());
-        String requestBody = objectMapper.writeValueAsString(idList);
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isUnauthorized());
+        String params = String.join(",", comment1.getId().toString(), comment2.getId().toString());
+        String url = ENDPOINT + "/comment?ids=" + params;
+        mvc.perform(get(url)).andExpect(status().isUnauthorized());
     }
 
 
@@ -113,8 +103,8 @@ class InfoControllerIT {
     }
 
     private Comment createComment(CommentThread thread, Comment reference, String userId) {
-        Comment comment = TestComment.defaultBuilder().thread(thread).reference(reference)
-                .userId(UUID.fromString(userId)).build().toParent();
+        Comment comment =
+                TestComment.defaultBuilder().thread(thread).reference(reference).userId(UUID.fromString(userId)).build().toParent();
         return commentRepository.saveAndFlush(comment);
     }
 

@@ -16,10 +16,11 @@ import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.model.TypeAndParent;
 import com.persoff68.fatodo.model.constant.CommentThreadType;
 import com.persoff68.fatodo.model.dto.CommentDTO;
+import com.persoff68.fatodo.model.vm.CommentVM;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
-import com.persoff68.fatodo.model.vm.CommentVM;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -48,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = FatodoCommentServiceApplication.class)
 @AutoConfigureMockMvc
 class CommentControllerIT {
-    private static final String ENDPOINT = "/api/comments";
+    private static final String ENDPOINT = "/api/comment";
 
     private static final String USER_ID_1 = "3c300277-b5ea-48d1-80db-ead620cf5846";
     private static final String USER_ID_2 = "357a2a99-7b7e-4336-9cd7-18f2cf73fab9";
@@ -79,9 +79,6 @@ class CommentControllerIT {
 
     @BeforeEach
     void setup() {
-        threadRepository.deleteAll();
-        commentRepository.deleteAll();
-
         thread1 = createCommentThread();
         thread2 = createCommentThread();
         comment1 = createComment(thread1, null, USER_ID_1);
@@ -89,14 +86,15 @@ class CommentControllerIT {
         comment3 = createComment(thread1, null, USER_ID_2);
         comment4 = createComment(thread2, null, USER_ID_1);
 
-        doNothing().when(wsServiceClient).sendCommentNewEvent(any());
-        doNothing().when(wsServiceClient).sendCommentUpdateEvent(any());
-        doNothing().when(wsServiceClient).sendReactionsEvent(any());
-        doNothing().when(eventServiceClient).addCommentEvent(any());
-
         TypeAndParent typeAndParent = new TypeAndParent(CommentThreadType.ITEM, UUID.randomUUID());
         when(itemServiceClient.getTypeAndParent(any())).thenReturn(typeAndParent);
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
+    }
+
+    @AfterEach
+    void cleanup() {
+        threadRepository.deleteAll();
+        commentRepository.deleteAll();
     }
 
     @Test
