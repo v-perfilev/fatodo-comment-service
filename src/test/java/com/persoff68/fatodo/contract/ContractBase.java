@@ -81,9 +81,9 @@ class ContractBase {
 
     @AfterEach
     void cleanup() {
+        reactionRepository.deleteAll();
+        commentRepository.deleteAll();
         threadRepository.deleteAll();
-        commentRepository.deleteAll();
-        commentRepository.deleteAll();
     }
 
     private CommentThread createCommentThread(UUID parentId, UUID targetId) {
