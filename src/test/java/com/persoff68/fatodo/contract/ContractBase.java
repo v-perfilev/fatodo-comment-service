@@ -15,7 +15,6 @@ import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
 import com.persoff68.fatodo.repository.ReactionRepository;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -63,6 +62,10 @@ class ContractBase {
 
     @BeforeEach
     void setup() {
+        reactionRepository.deleteAll();
+        commentRepository.deleteAll();
+        threadRepository.deleteAll();
+
         RestAssuredMockMvc.webAppContextSetup(context);
 
         CommentThread thread1 = createCommentThread(PARENT_ID, TARGET_ID);
@@ -77,13 +80,6 @@ class ContractBase {
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
         when(itemServiceClient.getAllowedGroupIds(any(), any())).thenReturn(List.of(PARENT_ID, TARGET_ID));
         when(itemServiceClient.getAllowedItemIds(any(), any())).thenReturn(List.of(PARENT_ID, TARGET_ID));
-    }
-
-    @AfterEach
-    void cleanup() {
-        reactionRepository.deleteAll();
-        commentRepository.deleteAll();
-        threadRepository.deleteAll();
     }
 
     private CommentThread createCommentThread(UUID parentId, UUID targetId) {
