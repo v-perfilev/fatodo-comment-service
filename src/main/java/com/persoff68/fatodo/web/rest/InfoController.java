@@ -5,7 +5,6 @@ import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.dto.CommentInfoDTO;
 import com.persoff68.fatodo.service.CommentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +25,7 @@ public class InfoController {
     private final CommentService commentService;
     private final CommentMapper commentMapper;
 
-    @GetMapping(value = "/comment", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/comment")
     public ResponseEntity<List<CommentInfoDTO>> getAllCommentInfoByIds(@RequestParam("ids") List<UUID> commentIdList) {
         List<Comment> commentList = commentService.getAllAllowedByIds(commentIdList);
         List<CommentInfoDTO> dtoList = commentList.stream()

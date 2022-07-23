@@ -2,7 +2,6 @@ package com.persoff68.fatodo.web.rest;
 
 import com.persoff68.fatodo.service.CommentThreadService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,7 +24,7 @@ public class CommentThreadController {
 
     private final CommentThreadService commentThreadService;
 
-    @GetMapping(value = "/count", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/count")
     public ResponseEntity<Map<UUID, Integer>> getCountMapByTargetIds(@RequestParam("ids") List<UUID> targetIdList) {
         Map<UUID, Integer> countMap = commentThreadService.getCountByTargetIds(targetIdList);
         return ResponseEntity.ok(countMap);
