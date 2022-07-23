@@ -15,6 +15,7 @@ import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
 import com.persoff68.fatodo.repository.ReactionRepository;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,7 +35,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMessageVerifier
 @Transactional
-public abstract class ContractBase {
+class ContractBase {
     private static final UUID USER_ID = UUID.fromString("8f9a7cae-73c8-4ad6-b135-5bd109b51d2e");
     private static final UUID PARENT_ID = UUID.fromString("06a8e075-1781-4ba9-8096-1d5777b8b09e");
     private static final UUID TARGET_ID = UUID.fromString("b73e8418-ff4a-472b-893d-4e248ae93797");
@@ -61,12 +62,8 @@ public abstract class ContractBase {
     EventServiceClient eventServiceClient;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         RestAssuredMockMvc.webAppContextSetup(context);
-
-        threadRepository.deleteAll();
-        commentRepository.deleteAll();
-        commentRepository.deleteAll();
 
         CommentThread thread1 = createCommentThread(PARENT_ID, TARGET_ID);
         Comment comment1 = createComment(COMMENT_ID_1, thread1, null, USER_ID);
@@ -80,6 +77,13 @@ public abstract class ContractBase {
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
         when(itemServiceClient.getAllowedGroupIds(any(), any())).thenReturn(List.of(PARENT_ID, TARGET_ID));
         when(itemServiceClient.getAllowedItemIds(any(), any())).thenReturn(List.of(PARENT_ID, TARGET_ID));
+    }
+
+    @AfterEach
+    void cleanup() {
+        threadRepository.deleteAll();
+        commentRepository.deleteAll();
+        commentRepository.deleteAll();
     }
 
     private CommentThread createCommentThread(UUID parentId, UUID targetId) {
