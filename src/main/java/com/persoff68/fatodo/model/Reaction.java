@@ -31,7 +31,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @IdClass(Reaction.ReactionId.class)
 @ToString(exclude = {"comment"})
-public class Reaction {
+public class Reaction implements Serializable {
+    @Serial
+    private static final long serialVersionUID = AppConstants.SERIAL_VERSION_UID;
 
     @Id
     @Column(name = "comment_id")

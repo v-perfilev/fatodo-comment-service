@@ -135,7 +135,7 @@ class InfoControllerIT {
         ThreadInfoDTO threadInfoDTO = resultList.stream().filter(i -> i.getTargetId().equals(thread1.getTargetId()))
                 .findFirst().orElseThrow(ChangeSetPersister.NotFoundException::new);
         assertThat(threadInfoDTO.getCount()).isEqualTo(2);
-        assertThat(threadInfoDTO.getUnread()).isEqualTo(0);
+        assertThat(threadInfoDTO.getUnread()).isZero();
     }
 
     @Test

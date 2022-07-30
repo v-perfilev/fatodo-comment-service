@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.model;
 
+import com.persoff68.fatodo.config.constant.AppConstants;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,6 +14,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +27,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(exclude = {"thread"})
-public class Comment extends AbstractAuditingModel {
+public class Comment extends AbstractAuditingModel implements Serializable {
+    @Serial
+    private static final long serialVersionUID = AppConstants.SERIAL_VERSION_UID;
 
     @ManyToOne
     private CommentThread thread;
