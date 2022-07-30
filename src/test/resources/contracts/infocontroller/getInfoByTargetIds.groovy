@@ -1,15 +1,15 @@
-package contracts.commentthreadcontroller
+package contracts.infocontroller
 
 import org.springframework.cloud.contract.spec.Contract
 
 Contract.make {
-    name 'get count map by targetIds'
-    description 'should return status 200 and map of UUID and Long'
+    name 'get info by targetIds'
+    description 'should return status 200 and list of ThreadInfoDTOs'
     request {
         method GET()
         url($(
-                consumer(regex("/api/thread/count\\?ids=.*")),
-                producer("/api/thread/count?ids=b73e8418-ff4a-472b-893d-4e248ae93797")
+                consumer(regex("/api/info/thread\\?ids=.*")),
+                producer("/api/info/thread?ids=b73e8418-ff4a-472b-893d-4e248ae93797")
         ))
         headers {
             header 'Authorization': $(
@@ -24,7 +24,13 @@ Contract.make {
             contentType applicationJson()
         }
         body([
-                "b73e8418-ff4a-472b-893d-4e248ae93797": "2"
+                [
+                        "parentId": anyUuid(),
+                        "targetId": anyUuid(),
+                        "type"    : anyNonBlankString(),
+                        "count"   : anyNumber(),
+                        "unread"  : anyNumber(),
+                ]
         ])
     }
 }

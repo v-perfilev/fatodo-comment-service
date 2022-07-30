@@ -2,11 +2,13 @@ package com.persoff68.fatodo.mapper;
 
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
+import com.persoff68.fatodo.model.CommentThreadInfo;
 import com.persoff68.fatodo.model.dto.CommentDTO;
 import com.persoff68.fatodo.model.dto.CommentInfoDTO;
 import com.persoff68.fatodo.model.dto.ReactionDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.ReferenceCommentDTO;
+import com.persoff68.fatodo.model.dto.ThreadInfoDTO;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -31,6 +33,8 @@ public abstract class CommentMapper {
     abstract ReferenceCommentDTO defaultPojoToReferenceDTO(Comment comment);
 
     public abstract CommentInfoDTO pojoToInfoDTO(Comment comment);
+
+    public abstract ThreadInfoDTO threadInfoToDTO(CommentThreadInfo commentThreadInfo);
 
     public CommentDTO pojoToDTO(Comment comment) {
         if (comment == null) {

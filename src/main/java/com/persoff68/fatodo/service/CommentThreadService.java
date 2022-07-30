@@ -2,7 +2,8 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.model.CommentThread;
-import com.persoff68.fatodo.model.CommentThreadAndCount;
+import com.persoff68.fatodo.model.CommentThreadInfo;
+import com.persoff68.fatodo.model.ReadStatus;
 import com.persoff68.fatodo.model.TypeAndParent;
 import com.persoff68.fatodo.model.constant.CommentThreadType;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
@@ -12,11 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,23 +46,14 @@ public class CommentThreadService {
                 .orElseThrow(ModelNotFoundException::new);
     }
 
-    public Map<UUID, Integer> getCountByTargetIds(List<UUID> targetIdList) {
-        List<CommentThreadAndCount> commentThreadAndCountList = commentThreadRepository
-                .getThreadsAndCountsByTargetIds(targetIdList);
-        List<CommentThread> threadList = commentThreadAndCountList.stream()
-                .map(CommentThreadAndCount::getThread).toList();
+    public List<CommentThreadInfo> getInfoByTargetIds(UUID userId, List<UUID> targetIdList) {
+        List<CommentThreadInfo> commentThreadInfoList = commentThreadRepository
+                .getThreadsAndCountsByTargetIds(userId, targetIdList);
+        List<CommentThread> threadList = commentThreadInfoList.stream()
+                .map(info -> CommentThread.of(info.getParentId(), info.getTargetId(), info.getType()))
+                .toList();
         permissionService.checkThreadsPermission("READ", threadList);
-
-        Map<UUID, Integer> countMap = commentThreadAndCountList.stream()
-                .collect(Collectors.toMap(t -> t.getThread().getTargetId(), CommentThreadAndCount::getCount));
-
-        List<UUID> existingTargetIdList = threadList.stream()
-                .map(CommentThread::getTargetId).toList();
-        List<UUID> emptyTargetIdList = targetIdList.stream()
-                .filter(id -> !existingTargetIdList.contains(id)).toList();
-        emptyTargetIdList.forEach(id -> countMap.put(id, 0));
-
-        return countMap;
+        return commentThreadInfoList;
     }
 
     @Transactional
@@ -82,6 +73,22 @@ public class CommentThreadService {
             permissionService.checkThreadPermission("ADMIN", thread);
             commentThreadRepository.delete(thread);
         }
+    }
+
+    @Transactional
+    public void refreshReadStatus(UUID userId, UUID targetId) {
+        CommentThread thread = commentThreadRepository.findByTargetId(targetId)
+                .orElseThrow(ModelNotFoundException::new);
+        permissionService.checkThreadPermission("READ", thread);
+
+        List<ReadStatus> readStatusList = thread.getReadStatuses();
+        ReadStatus readStatus = readStatusList.stream().filter(s -> s.getUserId().equals(userId))
+                .findFirst()
+                .orElse(ReadStatus.of(thread, userId));
+        thread.getReadStatuses().add(readStatus);
+        readStatus.setLastReadAt(new Date());
+        thread.getReadStatuses().add(readStatus);
+        commentThreadRepository.save(thread);
     }
 
     private TypeAndParent getTypeByTargetId(UUID targetId) {
