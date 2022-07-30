@@ -30,8 +30,6 @@ public interface CommentThreadRepository extends JpaRepository<CommentThread, UU
     List<CommentThreadInfo> getThreadsAndCountsByTargetIds(@Param("userId") UUID userId,
                                                            @Param("targetIds") List<UUID> targetIds);
 
-//    @Param("userId") UUID userId,
-
     List<CommentThread> findByParentId(UUID parentId);
 
     Optional<CommentThread> findByTargetId(UUID targetId);
