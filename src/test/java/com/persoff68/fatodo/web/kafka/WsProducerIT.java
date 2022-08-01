@@ -106,7 +106,7 @@ class WsProducerIT {
     void testSendCommentNewEvent() throws Exception {
         commentService.add(UUID.fromString(USER_ID_1), UUID.fromString(TARGET_ID), "comment", null);
 
-        ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
+        ConsumerRecord<String, String> record = wsRecords.poll(5, TimeUnit.SECONDS);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(record).isNotNull();
@@ -118,7 +118,7 @@ class WsProducerIT {
     void testSendCommentUpdateEvent() throws Exception {
         commentService.edit(UUID.fromString(USER_ID_1), comment.getId(), "updated-comment");
 
-        ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
+        ConsumerRecord<String, String> record = wsRecords.poll(5, TimeUnit.SECONDS);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(record).isNotNull();
@@ -130,7 +130,7 @@ class WsProducerIT {
     void testSendReactionsEvent() throws Exception {
         reactionService.setLike(UUID.fromString(USER_ID_2), comment.getId());
 
-        ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
+        ConsumerRecord<String, String> record = wsRecords.poll(5, TimeUnit.SECONDS);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(record).isNotNull();

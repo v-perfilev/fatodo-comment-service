@@ -89,7 +89,7 @@ class EventProducerIT {
         UUID targetId = UUID.randomUUID();
         commentService.add(userId, targetId, "test", null);
 
-        ConsumerRecord<String, String> record = eventAddRecords.poll(10, TimeUnit.SECONDS);
+        ConsumerRecord<String, String> record = eventAddRecords.poll(5, TimeUnit.SECONDS);
 
         assertThat(eventServiceClient).isInstanceOf(EventProducer.class);
         assertThat(record).isNotNull();
