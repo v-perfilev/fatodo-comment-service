@@ -41,7 +41,6 @@ public abstract class CommentMapper {
             return null;
         }
         CommentThread thread = comment.getThread();
-        UUID threadId = thread != null ? thread.getId() : null;
         UUID targetId = thread != null ? thread.getTargetId() : null;
 
         Comment reference = comment.getReference();
@@ -50,7 +49,6 @@ public abstract class CommentMapper {
         List<ReactionDTO> reactionList = getReactionList(comment);
 
         CommentDTO dto = defaultPojoToDTO(comment);
-        dto.setThreadId(threadId);
         dto.setTargetId(targetId);
         dto.setReference(referenceDTO);
         dto.setReactions(reactionList);
@@ -59,13 +57,11 @@ public abstract class CommentMapper {
 
     public ReactionsDTO pojoToReactionsDTO(Comment comment) {
         CommentThread thread = comment.getThread();
-        UUID threadId = thread != null ? thread.getId() : null;
         UUID targetId = thread != null ? thread.getTargetId() : null;
 
         List<ReactionDTO> reactionList = getReactionList(comment);
 
         ReactionsDTO dto = new ReactionsDTO();
-        dto.setThreadId(threadId);
         dto.setTargetId(targetId);
         dto.setCommentId(comment.getId());
         dto.setReactions(reactionList);
