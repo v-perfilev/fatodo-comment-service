@@ -11,8 +11,6 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 public class CommentDTO extends AbstractAuditingDTO {
 
-    private UUID threadId;
-
     private UUID targetId;
 
     private UUID userId;
