@@ -13,16 +13,16 @@ public class TestCommentDTO extends CommentDTO {
 
     @Builder
     public TestCommentDTO(UUID id,
-                          UUID threadId,
                           UUID userId,
+                          UUID targetId,
                           String text,
                           boolean isDeleted,
                           ReferenceCommentDTO reference,
                           List<ReactionDTO> reactions) {
         super();
         super.setId(id);
-        super.setThreadId(threadId);
         super.setUserId(userId);
+        super.setTargetId(targetId);
         super.setText(text);
         super.setDeleted(isDeleted);
         super.setReference(reference);
@@ -32,15 +32,15 @@ public class TestCommentDTO extends CommentDTO {
     public static TestCommentDTOBuilder defaultBuilder() {
         return TestCommentDTO.builder()
                 .text(DEFAULT_VALUE)
-                .threadId(UUID.randomUUID())
+                .targetId(UUID.randomUUID())
                 .userId(UUID.randomUUID());
     }
 
     public CommentDTO toParent() {
         CommentDTO dto = new CommentDTO();
         dto.setId(getId());
-        dto.setThreadId(getThreadId());
         dto.setUserId(getUserId());
+        dto.setTargetId(getTargetId());
         dto.setText(getText());
         dto.setDeleted(isDeleted());
         dto.setReference(getReference());
