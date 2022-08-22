@@ -61,14 +61,13 @@ class CommentThreadControllerIT {
     Comment comment1;
     Comment comment2;
     Comment comment3;
-    Reaction reaction1;
 
     @BeforeEach
     void setup() {
         thread1 = createCommentThread();
         comment1 = createComment(thread1, null, USER_ID);
         comment2 = createComment(thread1, comment1, USER_ID);
-        reaction1 = createReaction(comment1, USER_ID);
+        createReaction(comment1, USER_ID);
 
         thread2 = createCommentThreadWithParentId(thread1.getParentId());
         comment3 = createComment(thread2, null, USER_ID);
@@ -164,12 +163,13 @@ class CommentThreadControllerIT {
         return commentRepository.saveAndFlush(comment);
     }
 
-    private Reaction createReaction(Comment comment, String userId) {
+    private void createReaction(Comment comment, String userId) {
         Reaction reaction = TestReaction.defaultBuilder()
                 .comment(comment)
                 .type(ReactionType.LIKE)
                 .userId(UUID.fromString(userId)).build().toParent();
-        return reactionRepository.save(reaction);
+        comment.getReactions().add(reaction);
+        commentRepository.save(comment);
     }
 
 }

@@ -96,8 +96,8 @@ class ReactionControllerIT {
         String url = ENDPOINT + "/" + commentId + "/like";
         mvc.perform(post(url)).andExpect(status().isCreated());
         List<Reaction> reactionList = reactionRepository.findAll();
-        boolean reactionExists =
-                reactionList.stream().anyMatch(status -> status.getComment().getId().toString().equals(commentId) && status.getUserId().toString().equals(USER_ID_1) && status.getType().equals(ReactionType.LIKE));
+        boolean reactionExists = reactionList.stream()
+                .anyMatch(status -> status.getComment().getId().toString().equals(commentId) && status.getUserId().toString().equals(USER_ID_1) && status.getType().equals(ReactionType.LIKE));
         assertThat(reactionExists).isTrue();
     }
 

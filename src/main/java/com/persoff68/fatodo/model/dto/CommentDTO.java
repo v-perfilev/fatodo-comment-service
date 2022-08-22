@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -22,5 +22,5 @@ public class CommentDTO extends AbstractAuditingDTO {
 
     private ReferenceCommentDTO reference;
 
-    private List<ReactionDTO> reactions;
+    private Set<ReactionDTO> reactions;
 }

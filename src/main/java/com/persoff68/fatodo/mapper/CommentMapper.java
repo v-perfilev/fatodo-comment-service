@@ -15,8 +15,9 @@ import org.mapstruct.ReportingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
@@ -45,7 +46,7 @@ public abstract class CommentMapper {
         Comment reference = comment.getReference();
         ReferenceCommentDTO referenceDTO = reference != null ? defaultPojoToReferenceDTO(reference) : null;
 
-        List<ReactionDTO> reactionList = getReactionList(comment);
+        Set<ReactionDTO> reactionList = getReactionSet(comment);
 
         CommentDTO dto = defaultPojoToDTO(comment);
         dto.setTargetId(targetId);
@@ -54,12 +55,12 @@ public abstract class CommentMapper {
         return dto;
     }
 
-    private List<ReactionDTO> getReactionList(Comment comment) {
+    private Set<ReactionDTO> getReactionSet(Comment comment) {
         return comment.getReactions() != null
                 ? comment.getReactions().stream()
                 .map(reactionMapper::pojoToDTO)
-                .toList()
-                : Collections.emptyList();
+                .collect(Collectors.toSet())
+                : Collections.emptySet();
     }
 
 }

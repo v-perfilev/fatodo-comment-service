@@ -16,8 +16,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -25,8 +25,8 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@ToString(exclude = {"thread"})
+@EqualsAndHashCode(callSuper = true, exclude = {"thread", "reactions"})
+@ToString(exclude = {"thread", "reactions"})
 public class Comment extends AbstractAuditingModel implements Serializable {
     @Serial
     private static final long serialVersionUID = AppConstants.SERIAL_VERSION_UID;
@@ -42,7 +42,7 @@ public class Comment extends AbstractAuditingModel implements Serializable {
     private boolean isDeleted = false;
 
     @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "comment", orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Reaction> reactions = new ArrayList<>();
+    private Set<Reaction> reactions = new HashSet<>();
 
     @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
     private Comment reference;

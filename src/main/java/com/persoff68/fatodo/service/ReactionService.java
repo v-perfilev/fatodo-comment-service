@@ -4,7 +4,6 @@ import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.Reaction;
 import com.persoff68.fatodo.model.constant.ReactionType;
 import com.persoff68.fatodo.repository.CommentRepository;
-import com.persoff68.fatodo.repository.ReactionRepository;
 import com.persoff68.fatodo.service.client.EventService;
 import com.persoff68.fatodo.service.client.PermissionService;
 import com.persoff68.fatodo.service.client.WsService;
@@ -12,8 +11,8 @@ import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,8 +22,6 @@ import java.util.UUID;
 public class ReactionService {
 
     private final PermissionService permissionService;
-    private final EntityManager entityManager;
-    private final ReactionRepository reactionRepository;
     private final CommentRepository commentRepository;
     private final WsService wsService;
     private final EventService eventService;
@@ -42,21 +39,21 @@ public class ReactionService {
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.checkReactionPermission(userId, comment);
 
-        Reaction.ReactionId id = new Reaction.ReactionId(comment, userId);
-        Optional<Reaction> reactionOptional = reactionRepository.findById(id);
-        reactionOptional.ifPresent(reaction -> {
-            comment.getReactions().remove(reaction);
-            commentRepository.save(comment);
 
-            // WS
-            reaction.setType(ReactionType.NONE);
-            wsService.sendCommentReactionEvent(reaction, comment);
-            wsService.sendCommentReactionIncomingEvent(reaction, comment);
+        comment.getReactions().stream()
+                .filter(reaction -> reaction.getUserId().equals(userId))
+                .findFirst().ifPresent(reaction -> {
+                    comment.getReactions().remove(reaction);
+                    commentRepository.save(comment);
 
-            // EVENT
-            eventService.sendCommentReactionEvent(userId, comment, null);
-        });
+                    // WS
+                    reaction.setType(ReactionType.NONE);
+                    wsService.sendCommentReactionEvent(reaction, comment);
+                    wsService.sendCommentReactionIncomingEvent(reaction, comment);
 
+                    // EVENT
+                    eventService.sendCommentReactionEvent(userId, comment, null);
+                });
     }
 
     protected void set(UUID userId, UUID commentId, ReactionType type) {
@@ -64,12 +61,18 @@ public class ReactionService {
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.checkReactionPermission(userId, comment);
 
-        Reaction.ReactionId id = new Reaction.ReactionId(comment, userId);
-        Reaction reaction = reactionRepository.findById(id)
-                .orElse(Reaction.of(comment, userId, type));
-        reaction.setType(type);
+        Optional<Reaction> reactionOptional = comment.getReactions().stream()
+                .filter(reaction -> reaction.getUserId().equals(userId)).findFirst();
 
-        comment.getReactions().add(reaction);
+        Reaction reaction;
+        if (reactionOptional.isPresent()) {
+            reaction = reactionOptional.get();
+            reaction.setType(type);
+            reaction.setTimestamp(new Date());
+        } else {
+            reaction = Reaction.of(comment, userId, type);
+            comment.getReactions().add(reaction);
+        }
         commentRepository.save(comment);
 
         // WS
