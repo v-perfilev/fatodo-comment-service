@@ -8,7 +8,7 @@ import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.config.util.KafkaUtils;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.constant.CommentThreadType;
-import com.persoff68.fatodo.model.dto.WsEventWithUsersDTO;
+import com.persoff68.fatodo.model.dto.WsEventDTO;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
 import com.persoff68.fatodo.service.CommentService;
@@ -73,8 +73,8 @@ class WsProducerIT {
     @SpyBean
     WsServiceClient wsServiceClient;
 
-    private ConcurrentMessageListenerContainer<String, WsEventWithUsersDTO> wsContainer;
-    private BlockingQueue<ConsumerRecord<String, WsEventWithUsersDTO>> wsRecords;
+    private ConcurrentMessageListenerContainer<String, WsEventDTO> wsContainer;
+    private BlockingQueue<ConsumerRecord<String, WsEventDTO>> wsRecords;
 
     CommentThread thread;
 
@@ -99,7 +99,7 @@ class WsProducerIT {
     void testSendCommentNewEvent() throws Exception {
         commentService.add(UUID.fromString(USER_ID_1), UUID.fromString(TARGET_ID), "comment", null);
 
-        ConsumerRecord<String, WsEventWithUsersDTO> record = wsRecords.poll(5, TimeUnit.SECONDS);
+        ConsumerRecord<String, WsEventDTO> record = wsRecords.poll(5, TimeUnit.SECONDS);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(record).isNotNull();
@@ -107,13 +107,13 @@ class WsProducerIT {
     }
 
     private void startWsConsumer() {
-        JavaType javaType = objectMapper.getTypeFactory().constructType(WsEventWithUsersDTO.class);
-        ConcurrentKafkaListenerContainerFactory<String, WsEventWithUsersDTO> stringContainerFactory =
+        JavaType javaType = objectMapper.getTypeFactory().constructType(WsEventDTO.class);
+        ConcurrentKafkaListenerContainerFactory<String, WsEventDTO> stringContainerFactory =
                 KafkaUtils.buildJsonContainerFactory(embeddedKafkaBroker.getBrokersAsString(),
                         "test", "earliest", javaType);
         wsContainer = stringContainerFactory.createContainer("ws");
         wsRecords = new LinkedBlockingQueue<>();
-        wsContainer.setupMessageListener((MessageListener<String, WsEventWithUsersDTO>) wsRecords::add);
+        wsContainer.setupMessageListener((MessageListener<String, WsEventDTO>) wsRecords::add);
         wsContainer.start();
         ContainerTestUtils.waitForAssignment(wsContainer, embeddedKafkaBroker.getPartitionsPerTopic());
     }

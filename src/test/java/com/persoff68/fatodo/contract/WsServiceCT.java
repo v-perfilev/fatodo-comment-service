@@ -1,8 +1,8 @@
 package com.persoff68.fatodo.contract;
 
-import com.persoff68.fatodo.builder.TestWsEventWithUsersDTO;
+import com.persoff68.fatodo.builder.TestWsEventDTO;
 import com.persoff68.fatodo.client.WsServiceClient;
-import com.persoff68.fatodo.model.dto.WsEventWithUsersDTO;
+import com.persoff68.fatodo.model.dto.WsEventDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,7 +21,7 @@ class WsServiceCT {
 
     @Test
     void testSendEvent() {
-        WsEventWithUsersDTO dto = TestWsEventWithUsersDTO.defaultBuilder().build();
+        WsEventDTO dto = TestWsEventDTO.defaultBuilder().build().toParent();
         assertDoesNotThrow(() -> wsServiceClient.sendEvent(dto));
     }
 
