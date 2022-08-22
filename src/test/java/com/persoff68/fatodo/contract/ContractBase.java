@@ -93,8 +93,7 @@ class ContractBase {
                 .reference(reference)
                 .userId(userId)
                 .build().toParent();
-        entityManager.merge(comment);
-        return comment;
+        return entityManager.merge(comment);
     }
 
     private void createReaction(Comment comment, UUID userId) {
