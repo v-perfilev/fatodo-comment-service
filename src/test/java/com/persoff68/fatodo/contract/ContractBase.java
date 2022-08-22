@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
@@ -72,10 +71,6 @@ class ContractBase {
         Comment comment1 = createComment(COMMENT_ID_1, thread1, null, USER_ID);
         Comment comment2 = createComment(COMMENT_ID_2, thread1, comment1, UUID.randomUUID());
         createReaction(comment2.getId(), USER_ID);
-
-        doNothing().when(wsServiceClient).sendCommentNewEvent(any());
-        doNothing().when(wsServiceClient).sendCommentUpdateEvent(any());
-        doNothing().when(eventServiceClient).addCommentEvent(any());
 
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
         when(itemServiceClient.getAllowedGroupIds(any(), any())).thenReturn(List.of(PARENT_ID, TARGET_ID));
