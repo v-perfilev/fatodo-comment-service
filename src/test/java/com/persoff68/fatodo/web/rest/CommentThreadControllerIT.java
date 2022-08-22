@@ -165,10 +165,11 @@ class CommentThreadControllerIT {
     }
 
     private Reaction createReaction(Comment comment, String userId) {
-        Reaction reaction = TestReaction.defaultBuilder().commentId(comment.getId())
+        Reaction reaction = TestReaction.defaultBuilder()
+                .comment(comment)
                 .type(ReactionType.LIKE)
                 .userId(UUID.fromString(userId)).build().toParent();
-        return reactionRepository.saveAndFlush(reaction);
+        return reactionRepository.save(reaction);
     }
 
 }

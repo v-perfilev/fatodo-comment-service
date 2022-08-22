@@ -41,7 +41,7 @@ public class Comment extends AbstractAuditingModel implements Serializable {
 
     private boolean isDeleted = false;
 
-    @OneToMany(cascade = {CascadeType.REMOVE}, mappedBy = "comment", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "comment", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Reaction> reactions = new ArrayList<>();
 
     @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)

@@ -42,17 +42,16 @@ public class ReactionService {
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.checkReactionPermission(userId, comment);
 
-        Reaction.ReactionId id = new Reaction.ReactionId(commentId, userId);
+        Reaction.ReactionId id = new Reaction.ReactionId(comment, userId);
         Optional<Reaction> reactionOptional = reactionRepository.findById(id);
         reactionOptional.ifPresent(reaction -> {
-            reactionRepository.delete(reaction);
-            reactionRepository.flush();
-            entityManager.refresh(comment);
+            comment.getReactions().remove(reaction);
+            commentRepository.save(comment);
 
             // WS
             reaction.setType(ReactionType.NONE);
-            wsService.sendCommentReactionEvent(reaction);
-            wsService.sendCommentReactionIncomingEvent(reaction);
+            wsService.sendCommentReactionEvent(reaction, comment);
+            wsService.sendCommentReactionIncomingEvent(reaction, comment);
 
             // EVENT
             eventService.sendCommentReactionEvent(userId, comment, null);
@@ -65,16 +64,17 @@ public class ReactionService {
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.checkReactionPermission(userId, comment);
 
-        Reaction.ReactionId id = new Reaction.ReactionId(commentId, userId);
+        Reaction.ReactionId id = new Reaction.ReactionId(comment, userId);
         Reaction reaction = reactionRepository.findById(id)
-                .orElse(new Reaction(commentId, userId, type, comment));
+                .orElse(Reaction.of(comment, userId, type));
         reaction.setType(type);
-        reactionRepository.saveAndFlush(reaction);
-        entityManager.refresh(comment);
+
+        comment.getReactions().add(reaction);
+        commentRepository.save(comment);
 
         // WS
-        wsService.sendCommentReactionEvent(reaction);
-        wsService.sendCommentReactionIncomingEvent(reaction);
+        wsService.sendCommentReactionEvent(reaction, comment);
+        wsService.sendCommentReactionIncomingEvent(reaction, comment);
         // EVENT
         eventService.sendCommentReactionEvent(userId, comment, type);
     }

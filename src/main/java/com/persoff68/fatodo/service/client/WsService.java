@@ -43,16 +43,15 @@ public class WsService {
         wsServiceClient.sendEvent(dto);
     }
 
-    public void sendCommentReactionEvent(Reaction reaction) {
-        CommentThread thread = reaction.getComment().getThread();
-        List<UUID> userIdList = permissionService.getThreadUserIds(thread);
+    public void sendCommentReactionEvent(Reaction reaction, Comment comment) {
+        List<UUID> userIdList = permissionService.getThreadUserIds(comment.getThread());
         ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction);
         WsEventWithUsersDTO dto = new WsEventWithUsersDTO(userIdList, WsEventType.COMMENT_REACTION, reactionDTO);
         wsServiceClient.sendEvent(dto);
     }
 
-    public void sendCommentReactionIncomingEvent(Reaction reaction) {
-        List<UUID> userIdList = List.of(reaction.getComment().getUserId());
+    public void sendCommentReactionIncomingEvent(Reaction reaction, Comment comment) {
+        List<UUID> userIdList = List.of(comment.getUserId());
         ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction);
         WsEventWithUsersDTO dto = new WsEventWithUsersDTO(userIdList,
                 WsEventType.COMMENT_REACTION_INCOMING, reactionDTO);

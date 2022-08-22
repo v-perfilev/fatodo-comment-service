@@ -70,7 +70,7 @@ class ContractBase {
         CommentThread thread1 = createCommentThread(PARENT_ID, TARGET_ID);
         Comment comment1 = createComment(COMMENT_ID_1, thread1, null, USER_ID);
         Comment comment2 = createComment(COMMENT_ID_2, thread1, comment1, UUID.randomUUID());
-        createReaction(comment2.getId(), USER_ID);
+        createReaction(comment2, USER_ID);
 
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
         when(itemServiceClient.getAllowedGroupIds(any(), any())).thenReturn(List.of(PARENT_ID, TARGET_ID));
@@ -97,14 +97,14 @@ class ContractBase {
         return comment;
     }
 
-    private void createReaction(UUID commentId, UUID userId) {
+    private void createReaction(Comment comment, UUID userId) {
         Reaction reaction = TestReaction.defaultBuilder()
-                .commentId(commentId)
+                .comment(comment)
                 .userId(userId)
                 .type(ReactionType.LIKE)
                 .build()
                 .toParent();
-        reactionRepository.saveAndFlush(reaction);
+        reactionRepository.save(reaction);
     }
 
 }

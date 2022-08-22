@@ -1,6 +1,5 @@
 package com.persoff68.fatodo.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.persoff68.fatodo.config.constant.AppConstants;
 import com.persoff68.fatodo.model.constant.ReactionType;
 import lombok.AllArgsConstructor;
@@ -8,13 +7,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -36,8 +33,8 @@ public class Reaction implements Serializable {
     private static final long serialVersionUID = AppConstants.SERIAL_VERSION_UID;
 
     @Id
-    @Column(name = "comment_id")
-    private UUID commentId;
+    @ManyToOne
+    private Comment comment;
 
     @Id
     private UUID userId;
@@ -50,16 +47,12 @@ public class Reaction implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp = new Date();
 
-    @ManyToOne(targetEntity = Comment.class)
-    @JoinColumn(name = "comment_id", insertable = false, updatable = false)
-    @JsonBackReference
-    private Comment comment;
-
-    public Reaction(UUID commentId, UUID userId, ReactionType type, Comment comment) {
-        this.commentId = commentId;
-        this.userId = userId;
-        this.type = type;
-        this.comment = comment;
+    public static Reaction of(Comment comment, UUID userId, ReactionType type) {
+        Reaction reaction = new Reaction();
+        reaction.comment = comment;
+        reaction.userId = userId;
+        reaction.type = type;
+        return reaction;
     }
 
     @Data
@@ -69,7 +62,7 @@ public class Reaction implements Serializable {
         @Serial
         private static final long serialVersionUID = AppConstants.SERIAL_VERSION_UID;
 
-        private UUID commentId;
+        private Comment comment;
         private UUID userId;
     }
 

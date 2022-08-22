@@ -74,7 +74,7 @@ class ReactionControllerIT {
         comment1 = createComment(thread1, USER_ID_2);
         comment2 = createComment(thread1, USER_ID_1);
         comment3 = createComment(thread1, USER_ID_2);
-        createReaction(comment3.getId(), USER_ID_1, ReactionType.DISLIKE);
+        createReaction(comment3, USER_ID_1, ReactionType.DISLIKE);
 
         CommentThread thread2 = createThread();
         comment4 = createComment(thread2, USER_ID_2);
@@ -94,13 +94,10 @@ class ReactionControllerIT {
     void testSetLike_ok() throws Exception {
         String commentId = comment1.getId().toString();
         String url = ENDPOINT + "/" + commentId + "/like";
-        mvc.perform(post(url))
-                .andExpect(status().isCreated());
+        mvc.perform(post(url)).andExpect(status().isCreated());
         List<Reaction> reactionList = reactionRepository.findAll();
-        boolean reactionExists = reactionList.stream()
-                .anyMatch(status -> status.getCommentId().toString().equals(commentId)
-                        && status.getUserId().toString().equals(USER_ID_1)
-                        && status.getType().equals(ReactionType.LIKE));
+        boolean reactionExists =
+                reactionList.stream().anyMatch(status -> status.getComment().getId().toString().equals(commentId) && status.getUserId().toString().equals(USER_ID_1) && status.getType().equals(ReactionType.LIKE));
         assertThat(reactionExists).isTrue();
     }
 
@@ -109,13 +106,10 @@ class ReactionControllerIT {
     void testSetLike_ok_wasDislike() throws Exception {
         String commentId = comment3.getId().toString();
         String url = ENDPOINT + "/" + commentId + "/like";
-        mvc.perform(post(url))
-                .andExpect(status().isCreated());
+        mvc.perform(post(url)).andExpect(status().isCreated());
         List<Reaction> reactionList = reactionRepository.findAll();
-        boolean reactionExists = reactionList.stream()
-                .anyMatch(status -> status.getCommentId().toString().equals(commentId)
-                        && status.getUserId().toString().equals(USER_ID_1)
-                        && status.getType().equals(ReactionType.LIKE));
+        boolean reactionExists =
+                reactionList.stream().anyMatch(status -> status.getComment().getId().toString().equals(commentId) && status.getUserId().toString().equals(USER_ID_1) && status.getType().equals(ReactionType.LIKE));
         assertThat(reactionExists).isTrue();
     }
 
@@ -124,8 +118,7 @@ class ReactionControllerIT {
     void testSetLike_forbidden_ownMessage() throws Exception {
         String commentId = comment2.getId().toString();
         String url = ENDPOINT + "/" + commentId + "/like";
-        mvc.perform(post(url))
-                .andExpect(status().isForbidden());
+        mvc.perform(post(url)).andExpect(status().isForbidden());
     }
 
     @Test
@@ -134,8 +127,7 @@ class ReactionControllerIT {
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(false);
         String commentId = comment4.getId().toString();
         String url = ENDPOINT + "/" + commentId + "/like";
-        mvc.perform(post(url))
-                .andExpect(status().isForbidden());
+        mvc.perform(post(url)).andExpect(status().isForbidden());
     }
 
     @Test
@@ -143,8 +135,7 @@ class ReactionControllerIT {
     void testSetLike_notFound() throws Exception {
         String commentId = UUID.randomUUID().toString();
         String url = ENDPOINT + "/" + commentId + "/like";
-        mvc.perform(post(url))
-                .andExpect(status().isNotFound());
+        mvc.perform(post(url)).andExpect(status().isNotFound());
     }
 
     @Test
@@ -152,8 +143,7 @@ class ReactionControllerIT {
     void testSetLike_unauthorized() throws Exception {
         String commentId = comment1.getId().toString();
         String url = ENDPOINT + "/" + commentId + "/like";
-        mvc.perform(post(url))
-                .andExpect(status().isUnauthorized());
+        mvc.perform(post(url)).andExpect(status().isUnauthorized());
     }
 
 
@@ -162,13 +152,10 @@ class ReactionControllerIT {
     void testSetDislike_ok() throws Exception {
         String commentId = comment1.getId().toString();
         String url = ENDPOINT + "/" + commentId + "/dislike";
-        mvc.perform(post(url))
-                .andExpect(status().isCreated());
+        mvc.perform(post(url)).andExpect(status().isCreated());
         List<Reaction> reactionList = reactionRepository.findAll();
-        boolean reactionExists = reactionList.stream()
-                .anyMatch(status -> status.getCommentId().toString().equals(commentId)
-                        && status.getUserId().toString().equals(USER_ID_1)
-                        && status.getType().equals(ReactionType.DISLIKE));
+        boolean reactionExists =
+                reactionList.stream().anyMatch(status -> status.getComment().getId().toString().equals(commentId) && status.getUserId().toString().equals(USER_ID_1) && status.getType().equals(ReactionType.DISLIKE));
         assertThat(reactionExists).isTrue();
     }
 
@@ -178,8 +165,7 @@ class ReactionControllerIT {
     void testSetDislike_forbidden_ownMessage() throws Exception {
         String commentId = comment2.getId().toString();
         String url = ENDPOINT + "/" + commentId + "/dislike";
-        mvc.perform(post(url))
-                .andExpect(status().isForbidden());
+        mvc.perform(post(url)).andExpect(status().isForbidden());
     }
 
     @Test
@@ -188,8 +174,7 @@ class ReactionControllerIT {
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(false);
         String commentId = comment4.getId().toString();
         String url = ENDPOINT + "/" + commentId + "/dislike";
-        mvc.perform(post(url))
-                .andExpect(status().isForbidden());
+        mvc.perform(post(url)).andExpect(status().isForbidden());
     }
 
     @Test
@@ -197,8 +182,7 @@ class ReactionControllerIT {
     void testSetDislike_notFound() throws Exception {
         String commentId = UUID.randomUUID().toString();
         String url = ENDPOINT + "/" + commentId + "/dislike";
-        mvc.perform(post(url))
-                .andExpect(status().isNotFound());
+        mvc.perform(post(url)).andExpect(status().isNotFound());
     }
 
     @Test
@@ -206,8 +190,7 @@ class ReactionControllerIT {
     void testSetDislike_unauthorized() throws Exception {
         String commentId = comment1.getId().toString();
         String url = ENDPOINT + "/" + commentId + "/dislike";
-        mvc.perform(post(url))
-                .andExpect(status().isUnauthorized());
+        mvc.perform(post(url)).andExpect(status().isUnauthorized());
     }
 
 
@@ -216,12 +199,10 @@ class ReactionControllerIT {
     void testSetNone_ok() throws Exception {
         String commentId = comment3.getId().toString();
         String url = ENDPOINT + "/" + commentId;
-        mvc.perform(delete(url))
-                .andExpect(status().isCreated());
+        mvc.perform(delete(url)).andExpect(status().isCreated());
         List<Reaction> reactionList = reactionRepository.findAll();
-        boolean reactionExists = reactionList.stream()
-                .anyMatch(status -> status.getCommentId().toString().equals(commentId)
-                        && status.getUserId().toString().equals(USER_ID_1));
+        boolean reactionExists =
+                reactionList.stream().anyMatch(status -> status.getComment().getId().toString().equals(commentId) && status.getUserId().toString().equals(USER_ID_1));
         assertThat(reactionExists).isFalse();
     }
 
@@ -231,8 +212,7 @@ class ReactionControllerIT {
     void testSetNone_forbidden_ownMessage() throws Exception {
         String commentId = comment2.getId().toString();
         String url = ENDPOINT + "/" + commentId;
-        mvc.perform(delete(url))
-                .andExpect(status().isForbidden());
+        mvc.perform(delete(url)).andExpect(status().isForbidden());
     }
 
     @Test
@@ -241,8 +221,7 @@ class ReactionControllerIT {
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(false);
         String commentId = comment4.getId().toString();
         String url = ENDPOINT + "/" + commentId;
-        mvc.perform(delete(url))
-                .andExpect(status().isForbidden());
+        mvc.perform(delete(url)).andExpect(status().isForbidden());
     }
 
     @Test
@@ -250,8 +229,7 @@ class ReactionControllerIT {
     void testSetNone_badRequest_notFound() throws Exception {
         String commentId = UUID.randomUUID().toString();
         String url = ENDPOINT + "/" + commentId;
-        mvc.perform(delete(url))
-                .andExpect(status().isNotFound());
+        mvc.perform(delete(url)).andExpect(status().isNotFound());
     }
 
     @Test
@@ -259,8 +237,7 @@ class ReactionControllerIT {
     void testSetNone_unauthorized() throws Exception {
         String commentId = comment1.getId().toString();
         String url = ENDPOINT + "/" + commentId;
-        mvc.perform(delete(url))
-                .andExpect(status().isUnauthorized());
+        mvc.perform(delete(url)).andExpect(status().isUnauthorized());
     }
 
 
@@ -270,16 +247,16 @@ class ReactionControllerIT {
     }
 
     private Comment createComment(CommentThread thread, String userId) {
-        Comment comment = TestComment.defaultBuilder()
-                .thread(thread).userId(UUID.fromString(userId))
-                .build().toParent();
+        Comment comment =
+                TestComment.defaultBuilder().thread(thread).userId(UUID.fromString(userId)).build().toParent();
         return commentRepository.save(comment);
     }
 
-    private void createReaction(UUID commentId, String userId, ReactionType type) {
-        Reaction reaction = TestReaction.defaultBuilder()
-                .commentId(commentId).userId(UUID.fromString(userId)).type(type).build().toParent();
-        reactionRepository.save(reaction);
+    private void createReaction(Comment comment, String userId, ReactionType type) {
+        Reaction reaction =
+                TestReaction.defaultBuilder().comment(comment).userId(UUID.fromString(userId)).type(type).build().toParent();
+        comment.getReactions().add(reaction);
+        commentRepository.save(comment);
     }
 
 }
