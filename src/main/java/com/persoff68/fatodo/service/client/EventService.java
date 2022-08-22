@@ -6,7 +6,6 @@ import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.constant.ReactionType;
 import com.persoff68.fatodo.model.dto.CreateCommentEventDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +30,7 @@ public class EventService {
         recipientIdList.remove(userId);
         CreateCommentEventDTO dto = CreateCommentEventDTO.commentAdd(recipientIdList, userId,
                 parentId, targetId, commentId);
-        addCommentEventAsync(dto);
+        eventServiceClient.addCommentEvent(dto);
     }
 
     public void sendCommentReactionEvent(UUID userId, Comment comment, ReactionType reaction) {
@@ -43,11 +42,7 @@ public class EventService {
         String reactionName = reaction != null ? reaction.name() : null;
         CreateCommentEventDTO dto = CreateCommentEventDTO.commentReaction(recipientId, userId,
                 parentId, targetId, commentId, reactionName);
-        addCommentEventAsync(dto);
+        eventServiceClient.addCommentEvent(dto);
     }
 
-    @Async
-    public void addCommentEventAsync(CreateCommentEventDTO createCommentEventDTO) {
-        eventServiceClient.addCommentEvent(createCommentEventDTO);
-    }
 }

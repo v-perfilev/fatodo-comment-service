@@ -1,9 +1,7 @@
 package com.persoff68.fatodo.client;
 
 import com.persoff68.fatodo.exception.ClientException;
-import com.persoff68.fatodo.model.dto.CommentDTO;
-import com.persoff68.fatodo.model.dto.ReactionsDTO;
-import com.persoff68.fatodo.model.dto.WsEventDTO;
+import com.persoff68.fatodo.model.dto.WsEventWithUsersDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -16,29 +14,12 @@ public class WsServiceClientWrapper implements WsServiceClient {
     private final WsServiceClient wsServiceClient;
 
     @Override
-    public void sendCommentNewEvent(WsEventDTO<CommentDTO> event) {
+    public void sendEvent(WsEventWithUsersDTO event) {
         try {
-            wsServiceClient.sendCommentNewEvent(event);
+            wsServiceClient.sendEvent(event);
         } catch (Exception e) {
             throw new ClientException();
         }
     }
 
-    @Override
-    public void sendCommentUpdateEvent(WsEventDTO<CommentDTO> event) {
-        try {
-            wsServiceClient.sendCommentUpdateEvent(event);
-        } catch (Exception e) {
-            throw new ClientException();
-        }
-    }
-
-    @Override
-    public void sendReactionsEvent(WsEventDTO<ReactionsDTO> event) {
-        try {
-            wsServiceClient.sendReactionsEvent(event);
-        } catch (Exception e) {
-            throw new ClientException();
-        }
-    }
 }

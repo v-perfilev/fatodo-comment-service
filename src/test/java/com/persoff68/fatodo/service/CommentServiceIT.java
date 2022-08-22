@@ -26,7 +26,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = FatodoCommentServiceApplication.class)
@@ -67,9 +66,6 @@ class CommentServiceIT {
         TypeAndParent typeAndParent = new TypeAndParent(CommentThreadType.ITEM, UUID.randomUUID());
         when(itemServiceClient.getTypeAndParent(any())).thenReturn(typeAndParent);
         when(itemServiceClient.hasItemsPermission(any(), any())).thenReturn(true);
-
-        doNothing().when(wsServiceClient).sendCommentNewEvent(any());
-        doNothing().when(eventServiceClient).addCommentEvent(any());
 
         this.comment1 = commentService.add(USER_1_ID, TARGET_ID, "test", null);
         this.comment2 = commentService.add(USER_1_ID, TARGET_ID, "test", this.comment1.getId());

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -42,15 +43,21 @@ public class ReactionService {
         permissionService.checkReactionPermission(userId, comment);
 
         Reaction.ReactionId id = new Reaction.ReactionId(commentId, userId);
-        reactionRepository.findById(id).ifPresent(reactionRepository::delete);
-        reactionRepository.flush();
+        Optional<Reaction> reactionOptional = reactionRepository.findById(id);
+        reactionOptional.ifPresent(reaction -> {
+            reactionRepository.delete(reaction);
+            reactionRepository.flush();
+            entityManager.refresh(comment);
 
-        entityManager.refresh(comment);
+            // WS
+            reaction.setType(ReactionType.NONE);
+            wsService.sendCommentReactionEvent(reaction);
+            wsService.sendCommentReactionIncomingEvent(reaction);
 
-        // WS
-        wsService.sendCommentReactionEvent(comment);
-        // EVENT
-        eventService.sendCommentReactionEvent(userId, comment, null);
+            // EVENT
+            eventService.sendCommentReactionEvent(userId, comment, null);
+        });
+
     }
 
     protected void set(UUID userId, UUID commentId, ReactionType type) {
@@ -60,13 +67,14 @@ public class ReactionService {
 
         Reaction.ReactionId id = new Reaction.ReactionId(commentId, userId);
         Reaction reaction = reactionRepository.findById(id)
-                .orElse(new Reaction(commentId, userId, type));
+                .orElse(new Reaction(commentId, userId, type, comment));
         reaction.setType(type);
         reactionRepository.saveAndFlush(reaction);
         entityManager.refresh(comment);
 
         // WS
-        wsService.sendCommentReactionEvent(comment);
+        wsService.sendCommentReactionEvent(reaction);
+        wsService.sendCommentReactionIncomingEvent(reaction);
         // EVENT
         eventService.sendCommentReactionEvent(userId, comment, type);
     }

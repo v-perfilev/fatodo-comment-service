@@ -2,9 +2,8 @@ package com.persoff68.fatodo.web.kafka;
 
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.config.annotation.ConditionalOnPropertyNotNull;
-import com.persoff68.fatodo.model.dto.CommentDTO;
-import com.persoff68.fatodo.model.dto.ReactionsDTO;
-import com.persoff68.fatodo.model.dto.WsEventDTO;
+import com.persoff68.fatodo.config.constant.KafkaTopics;
+import com.persoff68.fatodo.model.dto.WsEventWithUsersDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -14,21 +13,10 @@ import org.springframework.stereotype.Component;
 @ConditionalOnPropertyNotNull(value = "kafka.bootstrapAddress")
 public class WsProducer implements WsServiceClient {
 
-    private static final String WS_COMMENT_TOPIC = "ws_comment";
+    private final KafkaTemplate<String, WsEventWithUsersDTO> wsKafkaTemplate;
 
-    private final KafkaTemplate<String, WsEventDTO<CommentDTO>> wsEventCommentKafkaTemplate;
-    private final KafkaTemplate<String, WsEventDTO<ReactionsDTO>> wsEventReactionsKafkaTemplate;
-
-    public void sendCommentNewEvent(WsEventDTO<CommentDTO> event) {
-        wsEventCommentKafkaTemplate.send(WS_COMMENT_TOPIC, "new", event);
-    }
-
-    public void sendCommentUpdateEvent(WsEventDTO<CommentDTO> event) {
-        wsEventCommentKafkaTemplate.send(WS_COMMENT_TOPIC, "update", event);
-    }
-
-    public void sendReactionsEvent(WsEventDTO<ReactionsDTO> event) {
-        wsEventReactionsKafkaTemplate.send(WS_COMMENT_TOPIC, "reactions", event);
+    public void sendEvent(WsEventWithUsersDTO event) {
+        wsKafkaTemplate.send(KafkaTopics.WS.getValue(), event);
     }
 
 }

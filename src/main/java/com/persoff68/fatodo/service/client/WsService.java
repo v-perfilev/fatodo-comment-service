@@ -2,13 +2,15 @@ package com.persoff68.fatodo.service.client;
 
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.mapper.CommentMapper;
+import com.persoff68.fatodo.mapper.ReactionMapper;
 import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
+import com.persoff68.fatodo.model.Reaction;
+import com.persoff68.fatodo.model.constant.WsEventType;
 import com.persoff68.fatodo.model.dto.CommentDTO;
-import com.persoff68.fatodo.model.dto.ReactionsDTO;
-import com.persoff68.fatodo.model.dto.WsEventDTO;
+import com.persoff68.fatodo.model.dto.ReactionDTO;
+import com.persoff68.fatodo.model.dto.WsEventWithUsersDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,44 +25,38 @@ public class WsService {
     private final WsServiceClient wsServiceClient;
     private final PermissionService permissionService;
     private final CommentMapper commentMapper;
+    private final ReactionMapper reactionMapper;
 
     public void sendCommentNewEvent(Comment comment) {
         CommentThread thread = comment.getThread();
         List<UUID> userIdList = permissionService.getThreadUserIds(thread);
         CommentDTO commentDTO = commentMapper.pojoToDTO(comment);
-        WsEventDTO<CommentDTO> eventDTO = new WsEventDTO<>(userIdList, commentDTO);
-        sendCommentNewEventAsync(eventDTO);
+        WsEventWithUsersDTO dto = new WsEventWithUsersDTO(userIdList, WsEventType.COMMENT_CREATE, commentDTO);
+        wsServiceClient.sendEvent(dto);
     }
 
     public void sendCommentUpdateEvent(Comment comment) {
         CommentThread thread = comment.getThread();
         List<UUID> userIdList = permissionService.getThreadUserIds(thread);
         CommentDTO commentDTO = commentMapper.pojoToDTO(comment);
-        WsEventDTO<CommentDTO> eventDTO = new WsEventDTO<>(userIdList, commentDTO);
-        sendCommentUpdateEventAsync(eventDTO);
+        WsEventWithUsersDTO dto = new WsEventWithUsersDTO(userIdList, WsEventType.COMMENT_UPDATE, commentDTO);
+        wsServiceClient.sendEvent(dto);
     }
 
-    public void sendCommentReactionEvent(Comment comment) {
-        CommentThread thread = comment.getThread();
+    public void sendCommentReactionEvent(Reaction reaction) {
+        CommentThread thread = reaction.getComment().getThread();
         List<UUID> userIdList = permissionService.getThreadUserIds(thread);
-        ReactionsDTO reactionsDTO = commentMapper.pojoToReactionsDTO(comment);
-        WsEventDTO<ReactionsDTO> eventDTO = new WsEventDTO<>(userIdList, reactionsDTO);
-        sendReactionsEventAsync(eventDTO);
+        ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction);
+        WsEventWithUsersDTO dto = new WsEventWithUsersDTO(userIdList, WsEventType.COMMENT_REACTION, reactionDTO);
+        wsServiceClient.sendEvent(dto);
     }
 
-    @Async
-    public void sendCommentNewEventAsync(WsEventDTO<CommentDTO> event) {
-        wsServiceClient.sendCommentNewEvent(event);
-    }
-
-    @Async
-    public void sendCommentUpdateEventAsync(WsEventDTO<CommentDTO> event) {
-        wsServiceClient.sendCommentUpdateEvent(event);
-    }
-
-    @Async
-    public void sendReactionsEventAsync(WsEventDTO<ReactionsDTO> event) {
-        wsServiceClient.sendReactionsEvent(event);
+    public void sendCommentReactionIncomingEvent(Reaction reaction) {
+        List<UUID> userIdList = List.of(reaction.getComment().getUserId());
+        ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction);
+        WsEventWithUsersDTO dto = new WsEventWithUsersDTO(userIdList,
+                WsEventType.COMMENT_REACTION_INCOMING, reactionDTO);
+        wsServiceClient.sendEvent(dto);
     }
 
 }

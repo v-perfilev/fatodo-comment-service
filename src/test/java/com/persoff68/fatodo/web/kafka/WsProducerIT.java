@@ -1,17 +1,16 @@
 package com.persoff68.fatodo.web.kafka;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.persoff68.fatodo.builder.TestComment;
 import com.persoff68.fatodo.builder.TestCommentThread;
 import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.config.util.KafkaUtils;
-import com.persoff68.fatodo.model.Comment;
 import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.constant.CommentThreadType;
+import com.persoff68.fatodo.model.dto.WsEventWithUsersDTO;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
-import com.persoff68.fatodo.repository.ReactionRepository;
 import com.persoff68.fatodo.service.CommentService;
 import com.persoff68.fatodo.service.ReactionService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -52,7 +51,6 @@ class WsProducerIT {
 
     private static final String TARGET_ID = "357a2a99-7b7e-4336-9cd7-18f2cf73fab9";
     private static final String USER_ID_1 = "3c300277-b5ea-48d1-80db-ead620cf5846";
-    private static final String USER_ID_2 = "a762e074-0c26-4a3e-9495-44ccb2baf85c";
 
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
@@ -69,26 +67,22 @@ class WsProducerIT {
     CommentThreadRepository threadRepository;
     @Autowired
     CommentRepository commentRepository;
-    @Autowired
-    ReactionRepository reactionRepository;
 
     @MockBean
     ItemServiceClient itemServiceClient;
     @SpyBean
     WsServiceClient wsServiceClient;
 
-    private ConcurrentMessageListenerContainer<String, String> wsContainer;
-    private BlockingQueue<ConsumerRecord<String, String>> wsRecords;
+    private ConcurrentMessageListenerContainer<String, WsEventWithUsersDTO> wsContainer;
+    private BlockingQueue<ConsumerRecord<String, WsEventWithUsersDTO>> wsRecords;
 
     CommentThread thread;
-    Comment comment;
 
     @BeforeEach
     void setup() {
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
 
         thread = createCommentThread(TARGET_ID);
-        comment = createComment(thread, null, USER_ID_1);
 
         startWsConsumer();
     }
@@ -97,7 +91,6 @@ class WsProducerIT {
     void cleanup() {
         threadRepository.deleteAll();
         commentRepository.deleteAll();
-        reactionRepository.deleteAll();
 
         stopWsConsumer();
     }
@@ -106,44 +99,21 @@ class WsProducerIT {
     void testSendCommentNewEvent() throws Exception {
         commentService.add(UUID.fromString(USER_ID_1), UUID.fromString(TARGET_ID), "comment", null);
 
-        ConsumerRecord<String, String> record = wsRecords.poll(5, TimeUnit.SECONDS);
+        ConsumerRecord<String, WsEventWithUsersDTO> record = wsRecords.poll(5, TimeUnit.SECONDS);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(record).isNotNull();
-        assertThat(record.key()).isEqualTo("new");
-        verify(wsServiceClient).sendCommentNewEvent(any());
-    }
-
-    @Test
-    void testSendCommentUpdateEvent() throws Exception {
-        commentService.edit(UUID.fromString(USER_ID_1), comment.getId(), "updated-comment");
-
-        ConsumerRecord<String, String> record = wsRecords.poll(5, TimeUnit.SECONDS);
-
-        assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
-        assertThat(record).isNotNull();
-        assertThat(record.key()).isEqualTo("update");
-        verify(wsServiceClient).sendCommentUpdateEvent(any());
-    }
-
-    @Test
-    void testSendReactionsEvent() throws Exception {
-        reactionService.setLike(UUID.fromString(USER_ID_2), comment.getId());
-
-        ConsumerRecord<String, String> record = wsRecords.poll(5, TimeUnit.SECONDS);
-
-        assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
-        assertThat(record).isNotNull();
-        assertThat(record.key()).isEqualTo("reactions");
-        verify(wsServiceClient).sendReactionsEvent(any());
+        verify(wsServiceClient).sendEvent(any());
     }
 
     private void startWsConsumer() {
-        ConcurrentKafkaListenerContainerFactory<String, String> stringContainerFactory =
-                KafkaUtils.buildStringContainerFactory(embeddedKafkaBroker.getBrokersAsString(), "test", "earliest");
-        wsContainer = stringContainerFactory.createContainer("ws_comment");
+        JavaType javaType = objectMapper.getTypeFactory().constructType(WsEventWithUsersDTO.class);
+        ConcurrentKafkaListenerContainerFactory<String, WsEventWithUsersDTO> stringContainerFactory =
+                KafkaUtils.buildJsonContainerFactory(embeddedKafkaBroker.getBrokersAsString(),
+                        "test", "earliest", javaType);
+        wsContainer = stringContainerFactory.createContainer("ws");
         wsRecords = new LinkedBlockingQueue<>();
-        wsContainer.setupMessageListener((MessageListener<String, String>) wsRecords::add);
+        wsContainer.setupMessageListener((MessageListener<String, WsEventWithUsersDTO>) wsRecords::add);
         wsContainer.start();
         ContainerTestUtils.waitForAssignment(wsContainer, embeddedKafkaBroker.getPartitionsPerTopic());
     }
@@ -161,9 +131,4 @@ class WsProducerIT {
         return threadRepository.saveAndFlush(thread);
     }
 
-    private Comment createComment(CommentThread thread, Comment reference, String userId) {
-        Comment comment = TestComment.defaultBuilder().thread(thread).reference(reference)
-                .userId(UUID.fromString(userId)).build().toParent();
-        return commentRepository.saveAndFlush(comment);
-    }
 }

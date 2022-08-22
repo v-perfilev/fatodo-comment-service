@@ -6,7 +6,6 @@ import com.persoff68.fatodo.model.CommentThreadInfo;
 import com.persoff68.fatodo.model.dto.CommentDTO;
 import com.persoff68.fatodo.model.dto.CommentInfoDTO;
 import com.persoff68.fatodo.model.dto.ReactionDTO;
-import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.ReferenceCommentDTO;
 import com.persoff68.fatodo.model.dto.ThreadInfoDTO;
 import org.mapstruct.InjectionStrategy;
@@ -51,19 +50,6 @@ public abstract class CommentMapper {
         CommentDTO dto = defaultPojoToDTO(comment);
         dto.setTargetId(targetId);
         dto.setReference(referenceDTO);
-        dto.setReactions(reactionList);
-        return dto;
-    }
-
-    public ReactionsDTO pojoToReactionsDTO(Comment comment) {
-        CommentThread thread = comment.getThread();
-        UUID targetId = thread != null ? thread.getTargetId() : null;
-
-        List<ReactionDTO> reactionList = getReactionList(comment);
-
-        ReactionsDTO dto = new ReactionsDTO();
-        dto.setTargetId(targetId);
-        dto.setCommentId(comment.getId());
         dto.setReactions(reactionList);
         return dto;
     }

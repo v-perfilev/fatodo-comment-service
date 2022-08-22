@@ -4,7 +4,7 @@ import lombok.Getter;
 
 public enum KafkaTopics {
     EVENT_ADD("event_add"),
-    WS_COMMENT("ws_comment");
+    WS("ws");
 
     @Getter
     private final String value;

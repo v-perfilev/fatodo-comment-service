@@ -1,9 +1,7 @@
 package com.persoff68.fatodo.client;
 
 import com.persoff68.fatodo.client.configuration.FeignSystemConfiguration;
-import com.persoff68.fatodo.model.dto.CommentDTO;
-import com.persoff68.fatodo.model.dto.ReactionsDTO;
-import com.persoff68.fatodo.model.dto.WsEventDTO;
+import com.persoff68.fatodo.model.dto.WsEventWithUsersDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,14 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
         qualifiers = {"feignWsServiceClient"})
 public interface WsServiceClient {
 
-    @PostMapping(value = "/api/comment/new")
-    void sendCommentNewEvent(@RequestBody WsEventDTO<CommentDTO> event);
-
-    @PostMapping(value = "/api/comment/update")
-    void sendCommentUpdateEvent(@RequestBody WsEventDTO<CommentDTO> event);
-
-    @PostMapping(value = "/api/comment/reactions")
-    void sendReactionsEvent(@RequestBody WsEventDTO<ReactionsDTO> event);
+    @PostMapping(value = "/api/event")
+    void sendEvent(@RequestBody WsEventWithUsersDTO event);
 
 }
 

@@ -55,10 +55,11 @@ public class Reaction implements Serializable {
     @JsonBackReference
     private Comment comment;
 
-    public Reaction(UUID commentId, UUID userId, ReactionType type) {
+    public Reaction(UUID commentId, UUID userId, ReactionType type, Comment comment) {
         this.commentId = commentId;
         this.userId = userId;
         this.type = type;
+        this.comment = comment;
     }
 
     @Data
