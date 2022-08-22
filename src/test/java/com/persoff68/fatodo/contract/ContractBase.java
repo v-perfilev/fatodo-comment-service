@@ -104,7 +104,8 @@ class ContractBase {
                 .type(ReactionType.LIKE)
                 .build()
                 .toParent();
-        reactionRepository.save(reaction);
+        comment.getReactions().add(reaction);
+        commentRepository.save(comment);
     }
 
 }
