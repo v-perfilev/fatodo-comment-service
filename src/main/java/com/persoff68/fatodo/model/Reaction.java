@@ -45,7 +45,7 @@ public class Reaction implements Serializable {
 
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
-    private Date timestamp = new Date();
+    private Date date = new Date();
 
     public static Reaction of(Comment comment, UUID userId, ReactionType type) {
         Reaction reaction = new Reaction();

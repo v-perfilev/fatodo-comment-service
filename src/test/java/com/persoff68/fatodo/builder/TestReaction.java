@@ -27,7 +27,7 @@ public class TestReaction extends Reaction {
         reaction.setUserId(getUserId());
         reaction.setComment(getComment());
         reaction.setType(getType());
-        reaction.setTimestamp(getTimestamp());
+        reaction.setDate(getDate());
         return reaction;
     }
 

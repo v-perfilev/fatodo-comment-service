@@ -16,7 +16,7 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
-            <column name="last_read_at" type="timestamp">
+            <column name="last_read_at" type="datetime">
                 <constraints nullable="false"/>
             </column>
         </createTable>

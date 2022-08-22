@@ -68,7 +68,7 @@ public class ReactionService {
         if (reactionOptional.isPresent()) {
             reaction = reactionOptional.get();
             reaction.setType(type);
-            reaction.setTimestamp(new Date());
+            reaction.setDate(new Date());
         } else {
             reaction = Reaction.of(comment, userId, type);
             comment.getReactions().add(reaction);
