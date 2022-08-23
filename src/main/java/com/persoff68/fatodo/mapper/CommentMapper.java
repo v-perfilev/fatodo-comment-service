@@ -58,7 +58,7 @@ public abstract class CommentMapper {
     private Set<ReactionDTO> getReactionSet(Comment comment) {
         return comment.getReactions() != null
                 ? comment.getReactions().stream()
-                .map(reactionMapper::pojoToDTO)
+                .map(reaction -> reactionMapper.pojoToDTO(reaction, comment.getThread().getTargetId()))
                 .collect(Collectors.toSet())
                 : Collections.emptySet();
     }

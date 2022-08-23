@@ -1,11 +1,13 @@
 package com.persoff68.fatodo.web.kafka;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.persoff68.fatodo.client.EventServiceClient;
 import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.config.util.KafkaUtils;
 import com.persoff68.fatodo.model.TypeAndParent;
 import com.persoff68.fatodo.model.constant.CommentThreadType;
+import com.persoff68.fatodo.model.dto.EventDTO;
 import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.repository.CommentThreadRepository;
 import com.persoff68.fatodo.service.CommentService;
@@ -63,8 +65,8 @@ class EventProducerIT {
     @SpyBean
     EventServiceClient eventServiceClient;
 
-    private ConcurrentMessageListenerContainer<String, String> eventAddContainer;
-    private BlockingQueue<ConsumerRecord<String, String>> eventAddRecords;
+    private ConcurrentMessageListenerContainer<String, EventDTO> eventContainer;
+    private BlockingQueue<ConsumerRecord<String, EventDTO>> eventRecords;
 
     @BeforeEach
     void setup() {
@@ -72,43 +74,45 @@ class EventProducerIT {
         when(itemServiceClient.getTypeAndParent(any())).thenReturn(typeAndParent);
         when(itemServiceClient.hasItemsPermission(any(), any())).thenReturn(true);
 
-        startEventAddConsumer();
+        startEventConsumer();
     }
 
     @AfterEach
     void cleanup() {
-        commentRepository.deleteAll();
         threadRepository.deleteAll();
+        commentRepository.deleteAll();
 
-        stopEventAddConsumer();
+        stopEventConsumer();
     }
 
     @Test
-    void testSendChatEvent_ok() throws Exception {
+    void testAddEvent_ok() throws Exception {
         UUID userId = UUID.randomUUID();
         UUID targetId = UUID.randomUUID();
         commentService.add(userId, targetId, "test", null);
 
-        ConsumerRecord<String, String> record = eventAddRecords.poll(5, TimeUnit.SECONDS);
+        ConsumerRecord<String, EventDTO> record = eventRecords.poll(5, TimeUnit.SECONDS);
 
         assertThat(eventServiceClient).isInstanceOf(EventProducer.class);
         assertThat(record).isNotNull();
         assertThat(record.key()).isEqualTo("comment");
-        verify(eventServiceClient).addCommentEvent(any());
+        verify(eventServiceClient).addEvent(any());
     }
 
-    private void startEventAddConsumer() {
-        ConcurrentKafkaListenerContainerFactory<String, String> stringContainerFactory =
-                KafkaUtils.buildStringContainerFactory(embeddedKafkaBroker.getBrokersAsString(), "test", "earliest");
-        eventAddContainer = stringContainerFactory.createContainer("event_add");
-        eventAddRecords = new LinkedBlockingQueue<>();
-        eventAddContainer.setupMessageListener((MessageListener<String, String>) eventAddRecords::add);
-        eventAddContainer.start();
-        ContainerTestUtils.waitForAssignment(eventAddContainer, embeddedKafkaBroker.getPartitionsPerTopic());
+    private void startEventConsumer() {
+        JavaType javaType = objectMapper.getTypeFactory().constructType(EventDTO.class);
+        ConcurrentKafkaListenerContainerFactory<String, EventDTO> containerFactory =
+                KafkaUtils.buildJsonContainerFactory(embeddedKafkaBroker.getBrokersAsString(),
+                        "test", "earliest", javaType);
+        eventContainer = containerFactory.createContainer("event");
+        eventRecords = new LinkedBlockingQueue<>();
+        eventContainer.setupMessageListener((MessageListener<String, EventDTO>) eventRecords::add);
+        eventContainer.start();
+        ContainerTestUtils.waitForAssignment(eventContainer, embeddedKafkaBroker.getPartitionsPerTopic());
     }
 
-    private void stopEventAddConsumer() {
-        eventAddContainer.stop();
+    private void stopEventConsumer() {
+        eventContainer.stop();
     }
 
 }

@@ -35,34 +35,30 @@ public class ReactionService {
     }
 
     public void remove(UUID userId, UUID commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(ModelNotFoundException::new);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(ModelNotFoundException::new);
         permissionService.checkReactionPermission(userId, comment);
 
 
-        comment.getReactions().stream()
-                .filter(reaction -> reaction.getUserId().equals(userId))
-                .findFirst().ifPresent(reaction -> {
-                    comment.getReactions().remove(reaction);
-                    commentRepository.save(comment);
+        comment.getReactions().stream().filter(reaction -> reaction.getUserId().equals(userId)).findFirst().ifPresent(reaction -> {
+            comment.getReactions().remove(reaction);
+            commentRepository.save(comment);
+            reaction.setType(ReactionType.NONE);
 
-                    // WS
-                    reaction.setType(ReactionType.NONE);
-                    wsService.sendCommentReactionEvent(reaction, comment);
-                    wsService.sendCommentReactionIncomingEvent(reaction, comment);
+            // WS
+            wsService.sendCommentReactionEvent(reaction);
+            wsService.sendCommentReactionIncomingEvent(reaction);
 
-                    // EVENT
-                    eventService.sendCommentReactionEvent(userId, comment, null);
-                });
+            // EVENT
+            eventService.sendCommentReactionIncomingEvent(reaction);
+        });
     }
 
     protected void set(UUID userId, UUID commentId, ReactionType type) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(ModelNotFoundException::new);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(ModelNotFoundException::new);
         permissionService.checkReactionPermission(userId, comment);
 
-        Optional<Reaction> reactionOptional = comment.getReactions().stream()
-                .filter(reaction -> reaction.getUserId().equals(userId)).findFirst();
+        Optional<Reaction> reactionOptional =
+                comment.getReactions().stream().filter(reaction -> reaction.getUserId().equals(userId)).findFirst();
 
         Reaction reaction;
         if (reactionOptional.isPresent()) {
@@ -76,10 +72,10 @@ public class ReactionService {
         commentRepository.save(comment);
 
         // WS
-        wsService.sendCommentReactionEvent(reaction, comment);
-        wsService.sendCommentReactionIncomingEvent(reaction, comment);
+        wsService.sendCommentReactionEvent(reaction);
+        wsService.sendCommentReactionIncomingEvent(reaction);
         // EVENT
-        eventService.sendCommentReactionEvent(userId, comment, type);
+        eventService.sendCommentReactionIncomingEvent(reaction);
     }
 
 }

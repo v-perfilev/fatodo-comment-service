@@ -96,7 +96,7 @@ class WsProducerIT {
     }
 
     @Test
-    void testSendCommentNewEvent() throws Exception {
+    void testSendEvent_ok() throws Exception {
         commentService.add(UUID.fromString(USER_ID_1), UUID.fromString(TARGET_ID), "comment", null);
 
         ConsumerRecord<String, WsEventDTO> record = wsRecords.poll(5, TimeUnit.SECONDS);
@@ -108,10 +108,10 @@ class WsProducerIT {
 
     private void startWsConsumer() {
         JavaType javaType = objectMapper.getTypeFactory().constructType(WsEventDTO.class);
-        ConcurrentKafkaListenerContainerFactory<String, WsEventDTO> stringContainerFactory =
+        ConcurrentKafkaListenerContainerFactory<String, WsEventDTO> containerFactory =
                 KafkaUtils.buildJsonContainerFactory(embeddedKafkaBroker.getBrokersAsString(),
                         "test", "earliest", javaType);
-        wsContainer = stringContainerFactory.createContainer("ws");
+        wsContainer = containerFactory.createContainer("ws");
         wsRecords = new LinkedBlockingQueue<>();
         wsContainer.setupMessageListener((MessageListener<String, WsEventDTO>) wsRecords::add);
         wsContainer.start();

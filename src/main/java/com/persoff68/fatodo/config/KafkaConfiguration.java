@@ -3,7 +3,7 @@ package com.persoff68.fatodo.config;
 import com.persoff68.fatodo.config.annotation.ConditionalOnPropertyNotNull;
 import com.persoff68.fatodo.config.constant.KafkaTopics;
 import com.persoff68.fatodo.config.util.KafkaUtils;
-import com.persoff68.fatodo.model.dto.CreateCommentEventDTO;
+import com.persoff68.fatodo.model.dto.EventDTO;
 import com.persoff68.fatodo.model.dto.WsEventDTO;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,13 +30,13 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public NewTopic wsCommentNewTopic() {
+    public NewTopic wsNewTopic() {
         return KafkaUtils.buildTopic(KafkaTopics.WS.getValue(), partitions);
     }
 
     @Bean
-    public NewTopic eventAddNewTopic() {
-        return KafkaUtils.buildTopic(KafkaTopics.EVENT_ADD.getValue(), partitions);
+    public NewTopic eventNewTopic() {
+        return KafkaUtils.buildTopic(KafkaTopics.EVENT.getValue(), partitions);
     }
 
     @Bean
@@ -45,7 +45,7 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public KafkaTemplate<String, CreateCommentEventDTO> eventCommentKafkaTemplate() {
+    public KafkaTemplate<String, EventDTO> eventKafkaTemplate() {
         return KafkaUtils.buildJsonKafkaTemplate(bootstrapAddress);
     }
 

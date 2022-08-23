@@ -54,7 +54,7 @@ public class CommentService {
         // WS
         wsService.sendCommentNewEvent(comment);
         // EVENT
-        eventService.sendCommentAddEvent(comment);
+        eventService.sendCommentNewEvent(comment);
 
         return comment;
     }
