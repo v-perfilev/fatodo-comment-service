@@ -1,7 +1,6 @@
 package com.persoff68.fatodo.mapper;
 
 import com.persoff68.fatodo.model.Comment;
-import com.persoff68.fatodo.model.CommentThread;
 import com.persoff68.fatodo.model.CommentThreadInfo;
 import com.persoff68.fatodo.model.dto.CommentDTO;
 import com.persoff68.fatodo.model.dto.CommentInfoDTO;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring",
@@ -40,8 +38,6 @@ public abstract class CommentMapper {
         if (comment == null) {
             return null;
         }
-        CommentThread thread = comment.getThread();
-        UUID targetId = thread != null ? thread.getTargetId() : null;
 
         Comment reference = comment.getReference();
         ReferenceCommentDTO referenceDTO = reference != null ? defaultPojoToReferenceDTO(reference) : null;
@@ -49,7 +45,8 @@ public abstract class CommentMapper {
         Set<ReactionDTO> reactionList = getReactionSet(comment);
 
         CommentDTO dto = defaultPojoToDTO(comment);
-        dto.setTargetId(targetId);
+        dto.setParentId(comment.getThread().getParentId());
+        dto.setTargetId(comment.getThread().getTargetId());
         dto.setReference(referenceDTO);
         dto.setReactions(reactionList);
         return dto;
@@ -58,7 +55,10 @@ public abstract class CommentMapper {
     private Set<ReactionDTO> getReactionSet(Comment comment) {
         return comment.getReactions() != null
                 ? comment.getReactions().stream()
-                .map(reaction -> reactionMapper.pojoToDTO(reaction, comment.getThread().getTargetId()))
+                .map(reaction -> reactionMapper.pojoToDTO(
+                        reaction,
+                        comment.getThread().getParentId(),
+                        comment.getThread().getTargetId()))
                 .collect(Collectors.toSet())
                 : Collections.emptySet();
     }

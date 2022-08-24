@@ -11,7 +11,8 @@ import java.util.UUID;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ReactionMapper {
 
+    @Mapping(target = "parentId", source = "parentId")
     @Mapping(target = "targetId", source = "targetId")
-    ReactionDTO pojoToDTO(Reaction reaction, UUID targetId);
+    ReactionDTO pojoToDTO(Reaction reaction, UUID parentId, UUID targetId);
 
 }

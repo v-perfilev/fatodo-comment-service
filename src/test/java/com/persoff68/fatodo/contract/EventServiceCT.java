@@ -2,7 +2,7 @@ package com.persoff68.fatodo.contract;
 
 import com.persoff68.fatodo.builder.TestEventDTO;
 import com.persoff68.fatodo.client.EventServiceClient;
-import com.persoff68.fatodo.model.dto.EventDTO;
+import com.persoff68.fatodo.model.dto.event.EventDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

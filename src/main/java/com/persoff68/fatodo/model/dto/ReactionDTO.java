@@ -9,6 +9,8 @@ import java.util.UUID;
 @Data
 public class ReactionDTO {
 
+    private UUID parentId;
+
     private UUID targetId;
 
     private UUID commentId;
