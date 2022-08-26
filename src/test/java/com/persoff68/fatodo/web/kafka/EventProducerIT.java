@@ -95,7 +95,6 @@ class EventProducerIT {
 
         assertThat(eventServiceClient).isInstanceOf(EventProducer.class);
         assertThat(record).isNotNull();
-        assertThat(record.key()).isEqualTo("comment");
         verify(eventServiceClient).addEvent(any());
     }
 
