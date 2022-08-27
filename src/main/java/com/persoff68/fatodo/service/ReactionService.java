@@ -39,18 +39,21 @@ public class ReactionService {
         permissionService.checkReactionPermission(userId, comment);
 
 
-        comment.getReactions().stream().filter(reaction -> reaction.getUserId().equals(userId)).findFirst().ifPresent(reaction -> {
-            comment.getReactions().remove(reaction);
-            commentRepository.save(comment);
-            reaction.setType(ReactionType.NONE);
+        comment.getReactions().stream()
+                .filter(reaction -> reaction.getUserId().equals(userId))
+                .findFirst()
+                .ifPresent(reaction -> {
+                    comment.getReactions().remove(reaction);
+                    commentRepository.save(comment);
+                    reaction.setType(ReactionType.NONE);
 
-            // WS
-            wsService.sendCommentReactionEvent(reaction);
-            wsService.sendCommentReactionIncomingEvent(reaction);
+                    // WS
+                    wsService.sendCommentReactionEvent(reaction);
+                    wsService.sendCommentReactionIncomingEvent(reaction);
 
-            // EVENT
-            eventService.sendCommentReactionIncomingEvent(reaction);
-        });
+                    // EVENT
+                    eventService.sendCommentReactionIncomingEvent(reaction);
+                });
     }
 
     protected void set(UUID userId, UUID commentId, ReactionType type) {
