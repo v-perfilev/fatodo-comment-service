@@ -25,9 +25,7 @@ Contract.make {
         }
         body([
                 [
-                        "parentId": anyUuid(),
                         "targetId": anyUuid(),
-                        "type"    : anyNonBlankString(),
                         "count"   : anyNumber(),
                         "unread"  : anyNumber(),
                 ]
