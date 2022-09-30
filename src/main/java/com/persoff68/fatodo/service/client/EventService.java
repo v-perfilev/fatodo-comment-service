@@ -42,10 +42,7 @@ public class EventService {
 
     public void sendCommentReactionIncomingEvent(Reaction reaction) {
         List<UUID> userIdList = List.of(reaction.getComment().getUserId());
-        ReactionDTO reactionDTO = reactionMapper.pojoToDTO(
-                reaction,
-                reaction.getComment().getThread().getParentId(),
-                reaction.getComment().getThread().getTargetId());
+        ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction);
         String payload = serialize(reactionDTO);
         EventDTO eventDTO = new EventDTO(userIdList, EventType.COMMENT_REACTION_INCOMING, payload,
                 reaction.getUserId());

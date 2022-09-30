@@ -6,13 +6,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-import java.util.UUID;
-
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ReactionMapper {
 
-    @Mapping(target = "parentId", source = "parentId")
-    @Mapping(target = "targetId", source = "targetId")
-    ReactionDTO pojoToDTO(Reaction reaction, UUID parentId, UUID targetId);
+    @Mapping(target = "parentId", source = "comment.thread.parentId")
+    @Mapping(target = "targetId", source = "comment.thread.targetId")
+    @Mapping(target = "commentId", source = "comment.id")
+    ReactionDTO pojoToDTO(Reaction reaction);
 
 }
