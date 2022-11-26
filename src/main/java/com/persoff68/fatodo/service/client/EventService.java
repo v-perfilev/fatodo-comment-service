@@ -40,6 +40,15 @@ public class EventService {
         eventServiceClient.addEvent(eventDTO);
     }
 
+    public void sendCommentDeleteEvent(Comment comment) {
+        CommentThread thread = comment.getThread();
+        List<UUID> userIdList = permissionService.getThreadUserIds(thread);
+        CommentDTO commentDTO = commentMapper.pojoToDTO(comment);
+        String payload = serialize(commentDTO);
+        EventDTO eventDTO = new EventDTO(userIdList, EventType.COMMENT_DELETE, payload, comment.getUserId());
+        eventServiceClient.addEvent(eventDTO);
+    }
+
     public void sendCommentReactionIncomingEvent(Reaction reaction) {
         List<UUID> userIdList = List.of(reaction.getComment().getUserId());
         ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction);

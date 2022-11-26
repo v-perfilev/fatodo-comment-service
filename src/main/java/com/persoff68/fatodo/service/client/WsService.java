@@ -49,6 +49,15 @@ public class WsService {
         wsServiceClient.sendEvent(dto);
     }
 
+    public void sendCommentDeleteEvent(Comment comment) {
+        CommentThread thread = comment.getThread();
+        List<UUID> userIdList = permissionService.getThreadUserIds(thread);
+        CommentDTO commentDTO = commentMapper.pojoToDTO(comment);
+        String payload = serialize(commentDTO);
+        WsEventDTO dto = new WsEventDTO(userIdList, WsEventType.COMMENT_DELETE, payload, comment.getUserId());
+        wsServiceClient.sendEvent(dto);
+    }
+
     public void sendCommentReactionEvent(Reaction reaction) {
         List<UUID> userIdList = permissionService.getThreadUserIds(reaction.getComment().getThread());
         ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction);

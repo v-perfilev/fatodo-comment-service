@@ -85,11 +85,12 @@ public class CommentService {
         commentRepository.save(comment);
 
         // WS
-        wsService.sendCommentUpdateEvent(comment);
+        wsService.sendCommentDeleteEvent(comment);
+        // EVENT
+        eventService.sendCommentDeleteEvent(comment);
     }
 
     private Comment addWithReference(UUID userId, UUID targetId, String text, UUID referenceId) {
-        Comment comment;
         Comment reference = commentRepository.findById(referenceId)
                 .orElseThrow(ModelNotFoundException::new);
         CommentThread thread = reference.getThread();
@@ -97,8 +98,7 @@ public class CommentService {
             throw new ModelInvalidException();
         }
         permissionService.checkThreadPermission("READ", thread);
-        comment = Comment.of(userId, thread, reference, text);
-        return comment;
+        return Comment.of(userId, thread, reference, text);
     }
 
     private Comment addWithoutReference(UUID userId, UUID targetId, String text) {
