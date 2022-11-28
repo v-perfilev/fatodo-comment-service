@@ -89,7 +89,7 @@ class EventProducerIT {
     void testAddEvent_ok() throws Exception {
         UUID userId = UUID.randomUUID();
         UUID targetId = UUID.randomUUID();
-        commentService.add(userId, targetId, "test", null);
+        commentService.add(userId, targetId, "test");
 
         ConsumerRecord<String, EventDTO> record = eventRecords.poll(5, TimeUnit.SECONDS);
 

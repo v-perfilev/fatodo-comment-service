@@ -67,9 +67,9 @@ class CommentServiceIT {
         when(itemServiceClient.getTypeAndParent(any())).thenReturn(typeAndParent);
         when(itemServiceClient.hasItemsPermission(any(), any())).thenReturn(true);
 
-        this.comment1 = commentService.add(USER_1_ID, TARGET_ID, "test", null);
-        this.comment2 = commentService.add(USER_1_ID, TARGET_ID, "test", this.comment1.getId());
-        this.comment3 = commentService.add(USER_2_ID, TARGET_ID, "test", this.comment1.getId());
+        this.comment1 = commentService.add(USER_1_ID, TARGET_ID, "test");
+        this.comment2 = commentService.add(USER_1_ID, TARGET_ID, "test");
+        this.comment3 = commentService.add(USER_2_ID, TARGET_ID, "test");
         this.thread = this.comment1.getThread();
     }
 

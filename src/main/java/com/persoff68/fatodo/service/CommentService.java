@@ -7,7 +7,6 @@ import com.persoff68.fatodo.repository.CommentRepository;
 import com.persoff68.fatodo.service.client.EventService;
 import com.persoff68.fatodo.service.client.PermissionService;
 import com.persoff68.fatodo.service.client.WsService;
-import com.persoff68.fatodo.service.exception.ModelInvalidException;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -45,10 +44,9 @@ public class CommentService {
     }
 
     @Transactional
-    public Comment add(UUID userId, UUID targetId, String text, UUID referenceId) {
-        Comment comment = referenceId == null
-                ? addWithoutReference(userId, targetId, text)
-                : addWithReference(userId, targetId, text, referenceId);
+    public Comment add(UUID userId, UUID targetId, String text) {
+        CommentThread thread = threadService.getByTargetIdOrCreate(targetId);
+        Comment comment = Comment.of(userId, thread, text);
         comment = commentRepository.save(comment);
 
         // WS
@@ -88,24 +86,6 @@ public class CommentService {
         wsService.sendCommentDeleteEvent(comment);
         // EVENT
         eventService.sendCommentDeleteEvent(comment);
-    }
-
-    private Comment addWithReference(UUID userId, UUID targetId, String text, UUID referenceId) {
-        Comment reference = commentRepository.findById(referenceId)
-                .orElseThrow(ModelNotFoundException::new);
-        CommentThread thread = reference.getThread();
-        if (!thread.getTargetId().equals(targetId)) {
-            throw new ModelInvalidException();
-        }
-        permissionService.checkThreadPermission("READ", thread);
-        return Comment.of(userId, thread, reference, text);
-    }
-
-    private Comment addWithoutReference(UUID userId, UUID targetId, String text) {
-        Comment comment;
-        CommentThread thread = threadService.getByTargetIdOrCreate(targetId);
-        comment = Comment.of(userId, thread, text);
-        return comment;
     }
 
 }

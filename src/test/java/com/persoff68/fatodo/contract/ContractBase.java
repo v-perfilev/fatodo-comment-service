@@ -68,8 +68,8 @@ class ContractBase {
         RestAssuredMockMvc.webAppContextSetup(context);
 
         CommentThread thread1 = createCommentThread(PARENT_ID, TARGET_ID);
-        Comment comment1 = createComment(COMMENT_ID_1, thread1, null, USER_ID);
-        Comment comment2 = createComment(COMMENT_ID_2, thread1, comment1, UUID.randomUUID());
+        Comment comment1 = createComment(COMMENT_ID_1, thread1, USER_ID);
+        Comment comment2 = createComment(COMMENT_ID_2, thread1, UUID.randomUUID());
         createReaction(comment2, USER_ID);
 
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
@@ -86,11 +86,10 @@ class ContractBase {
         return threadRepository.saveAndFlush(thread);
     }
 
-    private Comment createComment(UUID id, CommentThread thread, Comment reference, UUID userId) {
+    private Comment createComment(UUID id, CommentThread thread, UUID userId) {
         Comment comment = TestComment.defaultBuilder()
                 .id(id)
                 .thread(thread)
-                .reference(reference)
                 .userId(userId)
                 .build().toParent();
         return entityManager.merge(comment);

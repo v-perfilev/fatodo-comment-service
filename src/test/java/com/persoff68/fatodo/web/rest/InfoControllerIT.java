@@ -66,8 +66,8 @@ class InfoControllerIT {
     void setup() {
         thread1 = createCommentThread(CommentThreadType.GROUP);
         thread2 = createCommentThread(CommentThreadType.ITEM);
-        comment1 = createComment(thread1, null, USER_ID_1);
-        comment2 = createComment(thread1, comment1, USER_ID_1);
+        comment1 = createComment(thread1, USER_ID_1);
+        comment2 = createComment(thread1, USER_ID_1);
 
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
         when(itemServiceClient.hasItemsPermission(any(), any())).thenReturn(true);
@@ -191,9 +191,9 @@ class InfoControllerIT {
         return threadRepository.saveAndFlush(thread);
     }
 
-    private Comment createComment(CommentThread thread, Comment reference, String userId) {
-        Comment comment =
-                TestComment.defaultBuilder().thread(thread).reference(reference).userId(UUID.fromString(userId)).build().toParent();
+    private Comment createComment(CommentThread thread, String userId) {
+        Comment comment = TestComment.defaultBuilder()
+                .thread(thread).userId(UUID.fromString(userId)).build().toParent();
         return commentRepository.saveAndFlush(comment);
     }
 

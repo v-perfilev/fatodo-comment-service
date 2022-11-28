@@ -22,7 +22,5 @@ public class CommentDTO extends AbstractAuditingDTO {
     @JsonProperty("isDeleted")
     private boolean isDeleted;
 
-    private ReferenceCommentDTO reference;
-
     private Set<ReactionDTO> reactions;
 }

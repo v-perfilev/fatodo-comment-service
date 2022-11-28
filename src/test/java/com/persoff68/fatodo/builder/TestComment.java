@@ -14,15 +14,13 @@ public class TestComment extends Comment {
                        CommentThread thread,
                        UUID userId,
                        String text,
-                       boolean isDeleted,
-                       Comment reference) {
+                       boolean isDeleted) {
         super();
         super.setId(id);
         super.setThread(thread);
         super.setUserId(userId);
         super.setText(text);
         super.setDeleted(isDeleted);
-        super.setReference(reference);
     }
 
     public static TestCommentBuilder defaultBuilder() {
@@ -38,7 +36,6 @@ public class TestComment extends Comment {
         comment.setUserId(getUserId());
         comment.setText(getText());
         comment.setDeleted(isDeleted());
-        comment.setReference(getReference());
         return comment;
     }
 

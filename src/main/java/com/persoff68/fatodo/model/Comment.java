@@ -44,23 +44,11 @@ public class Comment extends AbstractAuditingModel implements Serializable {
     @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "comment", orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Reaction> reactions = new HashSet<>();
 
-    @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
-    private Comment reference;
-
     public static Comment of(UUID userId, CommentThread thread, String text) {
         Comment comment = new Comment();
         comment.setUserId(userId);
         comment.setThread(thread);
         comment.setText(text);
-        return comment;
-    }
-
-    public static Comment of(UUID userId, CommentThread thread, Comment reference, String text) {
-        Comment comment = new Comment();
-        comment.setUserId(userId);
-        comment.setThread(thread);
-        comment.setText(text);
-        comment.setReference(reference);
         return comment;
     }
 

@@ -3,16 +3,13 @@ package com.persoff68.fatodo.builder;
 import com.persoff68.fatodo.model.vm.CommentVM;
 import lombok.Builder;
 
-import java.util.UUID;
-
 public class TestCommentVM extends CommentVM {
     private static final String DEFAULT_VALUE = "test_value";
 
     @Builder
-    public TestCommentVM(String text, UUID referenceId) {
+    public TestCommentVM(String text) {
         super();
         super.setText(text);
-        super.setReferenceId(referenceId);
     }
 
     public static TestCommentVMBuilder defaultBuilder() {
@@ -22,7 +19,6 @@ public class TestCommentVM extends CommentVM {
     public CommentVM toParent() {
         CommentVM vm = new CommentVM();
         vm.setText(getText());
-        vm.setReferenceId(getReferenceId());
         return vm;
     }
 

@@ -97,7 +97,7 @@ class WsProducerIT {
 
     @Test
     void testSendEvent_ok() throws Exception {
-        commentService.add(UUID.fromString(USER_ID_1), UUID.fromString(TARGET_ID), "comment", null);
+        commentService.add(UUID.fromString(USER_ID_1), UUID.fromString(TARGET_ID), "comment");
 
         ConsumerRecord<String, WsEventDTO> record = wsRecords.poll(5, TimeUnit.SECONDS);
 

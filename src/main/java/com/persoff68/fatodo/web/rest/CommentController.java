@@ -58,7 +58,7 @@ public class CommentController {
     public ResponseEntity<CommentDTO> add(@PathVariable UUID targetId,
                                           @Valid @RequestBody CommentVM commentVM) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
-        Comment comment = commentService.add(userId, targetId, commentVM.getText(), commentVM.getReferenceId());
+        Comment comment = commentService.add(userId, targetId, commentVM.getText());
         CommentDTO dto = commentMapper.pojoToDTO(comment);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }

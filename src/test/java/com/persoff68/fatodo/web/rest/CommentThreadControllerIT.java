@@ -65,12 +65,12 @@ class CommentThreadControllerIT {
     @BeforeEach
     void setup() {
         thread1 = createCommentThread();
-        comment1 = createComment(thread1, null, USER_ID);
-        comment2 = createComment(thread1, comment1, USER_ID);
+        comment1 = createComment(thread1, USER_ID);
+        comment2 = createComment(thread1, USER_ID);
         createReaction(comment1, USER_ID);
 
         thread2 = createCommentThreadWithParentId(thread1.getParentId());
-        comment3 = createComment(thread2, null, USER_ID);
+        comment3 = createComment(thread2, USER_ID);
 
         when(itemServiceClient.hasGroupsPermission(any(), any())).thenReturn(true);
     }
@@ -157,8 +157,8 @@ class CommentThreadControllerIT {
         return threadRepository.saveAndFlush(thread);
     }
 
-    private Comment createComment(CommentThread thread, Comment reference, String userId) {
-        Comment comment = TestComment.defaultBuilder().thread(thread).reference(reference)
+    private Comment createComment(CommentThread thread, String userId) {
+        Comment comment = TestComment.defaultBuilder().thread(thread)
                 .userId(UUID.fromString(userId)).build().toParent();
         return commentRepository.saveAndFlush(comment);
     }

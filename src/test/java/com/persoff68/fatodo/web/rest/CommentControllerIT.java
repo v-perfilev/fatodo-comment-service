@@ -81,10 +81,10 @@ class CommentControllerIT {
     void setup() {
         thread1 = createCommentThread();
         thread2 = createCommentThread();
-        comment1 = createComment(thread1, null, USER_ID_1);
-        comment2 = createComment(thread1, comment1, USER_ID_1);
-        comment3 = createComment(thread1, null, USER_ID_2);
-        comment4 = createComment(thread2, null, USER_ID_1);
+        comment1 = createComment(thread1, USER_ID_1);
+        comment2 = createComment(thread1, USER_ID_1);
+        comment3 = createComment(thread1, USER_ID_2);
+        comment4 = createComment(thread2, USER_ID_1);
 
         TypeAndParent typeAndParent = new TypeAndParent(CommentThreadType.ITEM, UUID.randomUUID());
         when(itemServiceClient.getTypeAndParent(any())).thenReturn(typeAndParent);
@@ -169,35 +169,6 @@ class CommentControllerIT {
         CommentDTO dto = objectMapper.readValue(resultString, CommentDTO.class);
         assertThat(dto.getText()).isEqualTo(vm.getText());
         assertThat(dto.getUserId()).hasToString(USER_ID_1);
-    }
-
-    @Test
-    @WithCustomSecurityContext(id = USER_ID_1)
-    void testAdd_ok_withReference() throws Exception {
-        String url = ENDPOINT + "/" + thread1.getTargetId();
-        CommentVM vm = TestCommentVM.defaultBuilder().referenceId(comment3.getId()).build().toParent();
-        String requestBody = objectMapper.writeValueAsString(vm);
-        ResultActions resultActions = mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isCreated());
-        String resultString = resultActions.andReturn().getResponse().getContentAsString();
-        CommentDTO dto = objectMapper.readValue(resultString, CommentDTO.class);
-        assertThat(dto.getText()).isEqualTo(vm.getText());
-        assertThat(dto.getReference().getId()).isEqualTo(vm.getReferenceId());
-        assertThat(dto.getUserId()).hasToString(USER_ID_1);
-    }
-
-    @Test
-    @WithCustomSecurityContext(id = USER_ID_1)
-    void testAdd_withReference_badRequest_invalidModel() throws Exception {
-        String url = ENDPOINT + "/" + thread1.getTargetId();
-        CommentVM vm = TestCommentVM.defaultBuilder().referenceId(comment4.getId()).build().toParent();
-        String requestBody = objectMapper.writeValueAsString(vm);
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -351,8 +322,8 @@ class CommentControllerIT {
         return threadRepository.saveAndFlush(thread);
     }
 
-    private Comment createComment(CommentThread thread, Comment reference, String userId) {
-        Comment comment = TestComment.defaultBuilder().thread(thread).reference(reference)
+    private Comment createComment(CommentThread thread, String userId) {
+        Comment comment = TestComment.defaultBuilder().thread(thread)
                 .userId(UUID.fromString(userId)).build().toParent();
         return commentRepository.saveAndFlush(comment);
     }
