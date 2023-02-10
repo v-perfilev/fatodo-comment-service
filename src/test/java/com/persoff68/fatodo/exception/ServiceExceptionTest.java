@@ -1,16 +1,21 @@
 package com.persoff68.fatodo.exception;
 
-import com.persoff68.fatodo.service.exception.ModelAlreadyExistsException;
-import com.persoff68.fatodo.service.exception.ModelDuplicatedException;
-import com.persoff68.fatodo.service.exception.ModelInvalidException;
-import com.persoff68.fatodo.service.exception.ModelNotFoundException;
-import com.persoff68.fatodo.service.exception.PermissionException;
+import com.persoff68.fatodo.service.exception.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ServiceExceptionTest {
+
+    @Test
+    void testDatabaseException() {
+        Object exception = new DatabaseException();
+        assertThat(exception).isInstanceOf(AbstractException.class);
+        AbstractException abstractException = (AbstractException) exception;
+        assertThat(abstractException.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(abstractException.getFeedBackCode()).isEqualTo("model.databaseError");
+    }
 
     @Test
     void testModelAlreadyExistsException_firstConstructor() {
